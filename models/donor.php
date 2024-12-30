@@ -1,4 +1,7 @@
 <?php
+require_once 'Observer.php';
+require_once 'config/Database.php';
+
 class Donor implements Observer {
     private $db;
 

@@ -1,5 +1,6 @@
 <?php
 require_once 'MessageStrategies.php'; 
+require_once 'config/Database.php';
 
 class Communication {
     private $db;

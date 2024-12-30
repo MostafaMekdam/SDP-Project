@@ -1,5 +1,7 @@
 <?php
+require_once 'Observer.php';
 require_once 'Event.php';
+require_once 'config/Database.php';
 class Volunteer implements Observer {
     private $db;
 

@@ -1,16 +1,8 @@
 <?php
+require_once 'Subject.php'; // Include the Subject interface
+require_once 'Observer.php'; // Include the Observer interface
+require_once 'config/Database.php';
 
-// Subject interface
-interface Subject {
-    public function registerObserver(Observer $observer);
-    public function removeObserver(Observer $observer);
-    public function notifyObservers();
-}
-
-// Observer interface
-interface Observer {
-    public function update($eventData);
-}
 
 class Event implements Subject {
     private $db;
