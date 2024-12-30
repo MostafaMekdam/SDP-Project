@@ -27,13 +27,13 @@ class CommunicationController {
     // List all communications
     public function listCommunications() {
         $communications = $this->communicationModel->getCommunications();
-        require 'views/communication/list.php'; // Display list of communications
+        require 'views/communications/list.php'; // Display list of communications
     }
 
     // Get a specific communication
     public function getCommunication($id) {
         $communication = $this->communicationModel->getCommunicationById($id);
-        require 'views/communication/view.php'; // Display communication details
+        require 'views/communications/view.php'; // Display communication details
     }
 
     // Update an existing communication

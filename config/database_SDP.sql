@@ -107,3 +107,10 @@ CREATE TABLE VolunteerTask_Volunteers (
     FOREIGN KEY (volunteer_id) REFERENCES Volunteer(volunteer_id),
     PRIMARY KEY (task_id, volunteer_id)
 );
+CREATE TABLE users (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('Admin', 'Donor', 'Volunteer') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
