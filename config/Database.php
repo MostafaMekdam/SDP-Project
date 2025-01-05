@@ -43,6 +43,10 @@ class Database {
         return $stmt->execute($params);  // Return true if the query executes successfully
     }
 
+    public function lastInsertId() {
+        return $this->pdo->lastInsertId();
+    }
+
     // Prevent cloning of the instance
     private function __clone() {}
 

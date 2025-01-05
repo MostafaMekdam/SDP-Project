@@ -43,6 +43,7 @@ $routes = [
     'event' => EventController::class,
     'volunteer' => VolunteerController::class,
     'auth' => AuthController::class,
+    'admin' => AdminController::class,
 ];
 
 // Instantiate Router with route definitions

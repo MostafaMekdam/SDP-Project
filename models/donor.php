@@ -24,7 +24,7 @@ class Donor implements Observer {
     }
 
     public function addDonor($donorData) {
-        $query = "INSERT INTO donor (name, contact_info) VALUES (:name, :contact_info)";
+        $query = "INSERT INTO donor (name, contact_info, user_id) VALUES (:name, :contact_info, :user_id)";
         return $this->db->execute($query, $donorData);
     }
 

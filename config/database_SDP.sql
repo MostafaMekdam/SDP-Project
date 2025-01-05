@@ -1,7 +1,9 @@
 CREATE TABLE Donor (
     donor_id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
-    contact_info VARCHAR(255)
+    contact_info VARCHAR(255),
+    user_id INT UNIQUE, -- Link to the users table
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 CREATE TABLE Volunteer (

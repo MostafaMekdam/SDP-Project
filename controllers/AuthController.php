@@ -10,22 +10,25 @@ class AuthController {
 
     public function register() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Handle form submission
             $username = $_POST['username'];
             $password = $_POST['password'];
             $role = $_POST['role'];
-    
-            $result = $this->userModel->register($username, $password, $role);
-            if ($result) {
-                header("Location: index.php?controller=auth&action=login");
+            $contactInfo = $_POST['contact_info'] ?? null;
+
+            try {
+                // Use UserFactory to create the user
+                UserFactory::createUser($username, $password, $role, ['contact_info' => $contactInfo]);
+
+                // Redirect to login after successful registration
+                header('Location: index.php?controller=auth&action=login');
                 exit;
-            } else {
-                echo "Registration failed.";
+            } catch (Exception $e) {
+                echo "Error: " . $e->getMessage();
             }
-        } else {
-            echo "Serving registration form..."; // Debugging line
-            require 'views/auth/register.php';
         }
+
+        // Show registration form
+        include 'views/auth/register.php';
     }
     
     

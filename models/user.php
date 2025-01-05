@@ -8,14 +8,19 @@ class User {
         $this->db = Database::getInstance();
     }
 
-    public function register($username, $password, $role) {
-        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+    public function createUser($username, $password, $role) {
         $query = "INSERT INTO users (username, password, role) VALUES (:username, :password, :role)";
-        return $this->db->execute($query, [
+        $params = [
             ':username' => $username,
-            ':password' => $hashedPassword,
+            ':password' => $password,
             ':role' => $role
-        ]);
+        ];
+
+        if ($this->db->execute($query, $params)) {
+            return $this->db->lastInsertId(); // Return the created user ID
+        }
+        return false;
+    
     }
 
     public function login($username, $password) {
