@@ -37,6 +37,12 @@ class Donor implements Observer {
         $query = "DELETE FROM donor WHERE donor_id = :donor_id";
         return $this->db->execute($query, [':donor_id' => $donorId]);
     }
+    public function getDonationById($donationId) {
+        $query = "SELECT * FROM Donation WHERE donation_id = :donation_id";
+        $result = $this->db->query($query, [':donation_id' => $donationId]);
+        return count($result) > 0 ? $result[0] : null; // Return the first result or null if no record is found
+    }
+    
 }
 
 ?>

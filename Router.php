@@ -28,7 +28,13 @@ class Router {
             return;
         }
 
-        call_user_func_array([$controllerInstance, $action], $params);
+        $queryParams = $_GET;
+        unset($queryParams['controller'], $queryParams['action']); // Remove reserved parameters
+        $mergedParams = array_merge($queryParams, $params);
+
+        $orderedParams = array_values($mergedParams);
+
+        call_user_func_array([$controllerInstance, $action], $orderedParams);
     }
 
     private function error(string $message) {

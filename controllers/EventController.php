@@ -47,8 +47,13 @@ class EventController {
     // List all events
     public function list() {
         $events = $this->eventModel->getEvents();
-        require 'views/event/list.php';
+        if ($_SESSION['role'] === 'Donor') {
+            include 'views/event/donor_list.php'; // Separate view for donors
+        } else {
+            include 'views/event/list.php'; // Existing view for admins
+        }
     }
+    
 
     // Display add event form
     public function add() {

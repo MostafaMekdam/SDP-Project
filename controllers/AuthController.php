@@ -1,5 +1,6 @@
 <?php
 require_once 'models/User.php';
+require_once 'UserFactory.php';
 
 class AuthController {
     private $userModel;

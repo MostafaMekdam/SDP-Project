@@ -31,7 +31,11 @@ CREATE TABLE Donation (
     donation_id INT PRIMARY KEY AUTO_INCREMENT,
     donor_id INT,
     type VARCHAR(50),
-    FOREIGN KEY (donor_id) REFERENCES Donor(donor_id)
+    amount DECIMAL(10, 2) NOT NULL,
+    date DATETIME NOT NULL,
+    FOREIGN KEY (donor_id) REFERENCES Donor(donor_id),
+    event_id INT DEFAULT NULL,
+    FOREIGN KEY (event_id) REFERENCES Event(event_id)
 );
 
 CREATE TABLE Event (
