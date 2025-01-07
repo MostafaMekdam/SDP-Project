@@ -66,7 +66,7 @@ function displayUserControlPanel() {
             break;
         case 'Volunteer':
             echo "<li><a href='?controller=event&action=list'>View Events</a></li>";
-            echo "<li><a href='?controller=volunteer&action=skills'>My Skills</a></li>";
+            echo "<li><a href='?controller=volunteer&action=addSkills'>Add Skills</a></li>";
             break;
         default:
             redirectToLogin();

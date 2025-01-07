@@ -28,10 +28,7 @@ class DonorController {
         return $result[0]['donor_id']; // Assuming the query returns at least one result
     }
     
-    
-    
-    
-
+ 
     // Adds a new donor
     public function addDonor($data) {
         $data = [

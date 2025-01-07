@@ -1,6 +1,7 @@
 <?php
 require_once 'models/User.php';
 require_once 'models/Donor.php';
+require_once 'models/Volunteer.php'; // Added Volunteer model
 
 class UserFactory {
     /**
@@ -16,6 +17,7 @@ class UserFactory {
     public static function createUser($username, $password, $role, $extraData = []) {
         $userModel = new User();
         $donorModel = new Donor();
+        $volunteerModel = new Volunteer(); // Initialize Volunteer model
 
         // Hash the password securely
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
@@ -33,7 +35,7 @@ class UserFactory {
                 break;
 
             case 'Volunteer':
-                self::handleVolunteerCreation($username, $extraData, $userId);
+                self::handleVolunteerCreation($username, $extraData, $userId, $volunteerModel);
                 break;
 
             case 'Admin':
@@ -75,14 +77,37 @@ class UserFactory {
     }
 
     /**
-     * Handle volunteer-specific creation logic (if needed).
+     * Handle volunteer-specific creation logic.
      *
      * @param string $username The username of the volunteer.
      * @param array $extraData Additional data required for the volunteer.
      * @param int $userId The user ID linked to the volunteer.
+     * @param Volunteer $volunteerModel The Volunteer model instance.
+     * @throws Exception If volunteer creation fails.
      */
     private static function handleVolunteerCreation($username, $extraData, $userId) {
-        // Placeholder for volunteer-specific logic, if required in the future
+        if (empty($extraData['contact_info'])) {
+            throw new Exception("Contact info is required for Volunteer role.");
+        }
+    
+        $volunteerData = [
+            ':name' => $username,
+            ':contact_info' => $extraData['contact_info'],
+            ':availability' => $extraData['availability'] ?? 0, // Default to unavailable
+            ':user_id' => $userId,
+        ];
+    
+        $query = "INSERT INTO Volunteer (name, contact_info, availability, user_id) 
+                  VALUES (:name, :contact_info, :availability, :user_id)";
+
+var_dump($query, $volunteerData);
+
+    
+        $db = Database::getInstance();
+        if (!$db->execute($query, $volunteerData)) {
+            throw new Exception("Failed to create volunteer in the `Volunteer` table.");
+        }
     }
+    
 }
 ?>

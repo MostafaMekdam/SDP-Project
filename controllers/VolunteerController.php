@@ -4,10 +4,12 @@ require_once "C:/xampp/htdocs/projects/MVC/VolunteerDecorators.php";
 
 class VolunteerController {
     private $volunteerModel;
+    private $db;
 
     public function __construct() {
         // Initialize the Volunteer model
         $this->volunteerModel = new Volunteer();
+        $this->db = Database::getInstance();
     }
 
     // Adds a new volunteer
@@ -52,5 +54,25 @@ class VolunteerController {
         $volunteers = $this->volunteerModel->getVolunteers();
         require 'views/volunteer/list.php';
     }
+
+
+    public function addSkills() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $volunteerId = $_SESSION['user_id']; // Ensure the volunteer is logged in
+            $volunteer = $this->volunteerModel->getVolunteerById($volunteerId);
+    
+            // Apply decorator pattern to add skills
+            $decoratedVolunteer = new SkillDecorator($volunteer);
+            $decoratedVolunteer->addSkill('First Aid');
+            $decoratedVolunteer->addSkill('CPR');
+            $decoratedVolunteer->displaySkills();
+    
+            echo "Skills added successfully.";
+        } else {
+            include 'views/volunteer/add_skills.php'; // Create this view
+        }
+    }
+
+    
 }
 ?>

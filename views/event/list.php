@@ -23,6 +23,10 @@
             <td>
                 <a href="index.php?controller=event&action=view&id=<?= $event['event_id'] ?>">View</a>
                 <a href="index.php?controller=event&action=edit&id=<?= $event['event_id'] ?>">Edit</a>
+                <a href="index.php?controller=event&action=register&event_id=<?= $event['event_id'] ?>" 
+                   onclick="return confirm('Are you sure you want to register for this event?')">
+                   Register
+                </a>
             </td>
         </tr>
         <?php endforeach; ?>

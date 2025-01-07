@@ -11,9 +11,16 @@ class Volunteer implements Observer {
     }
 
     public function update($eventData) {
-        // Logic to update volunteer based on event changes
-        echo "Volunteer notified about event: " . $eventData['name'] . "\n";
+        echo "Volunteer notified: Event '{$eventData['name']}' has been updated.\n";
     }
+
+
+    public function getVolunteerByUserId($userId) {
+        $query = "SELECT * FROM Volunteer WHERE user_id = :user_id";
+        return $this->db->query($query, [':user_id' => $userId])[0] ?? null;
+    }
+    
+    
 
     // Get all volunteers
     public function getVolunteers() {

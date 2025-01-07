@@ -7,11 +7,14 @@ CREATE TABLE Donor (
 );
 
 CREATE TABLE Volunteer (
-    volunteer_id INT PRIMARY KEY,
+    volunteer_id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100),
     contact_info VARCHAR(255),
-    availability BIT
+    availability BIT,
+    user_id INT UNIQUE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
+
 
 
 
