@@ -15,8 +15,22 @@ class DonorController {
             header('Location: index.php?controller=auth&action=login');
             exit;
         }
-        return $_SESSION['user_id'];
+    
+        // Assuming `user_id` in `donor` table matches `user_id` in session
+        $userId = $_SESSION['user_id'];
+        $query = "SELECT donor_id FROM Donor WHERE user_id = :user_id";
+        $result = $this->db->query($query, [':user_id' => $userId]);
+    
+        if (empty($result)) {
+            throw new Exception("No donor associated with the logged-in user.");
+        }
+    
+        return $result[0]['donor_id']; // Assuming the query returns at least one result
     }
+    
+    
+    
+    
 
     // Adds a new donor
     public function addDonor($data) {
@@ -50,6 +64,13 @@ class DonorController {
     public function addDonation() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $donorId = $this->getLoggedInDonorId();
+
+            $query = "SELECT COUNT(*) AS count FROM Donor WHERE donor_id = :donor_id";
+            $result = $this->db->query($query, [':donor_id' => $donorId]);
+            if ($result[0]['count'] == 0) {
+                echo "Error: Donor does not exist. Please contact the administrator.";
+                return;
+            }
             $type = $_POST['type'];
             $amount = $_POST['amount'];
             $eventId = $_POST['event_id'] ?? null; // Optional event ID
@@ -58,14 +79,17 @@ class DonorController {
             $query = "INSERT INTO Donation (donor_id, event_id, type, amount, date) 
                       VALUES (:donor_id, :event_id, :type, :amount, :date)";
             $params = [
-                ':donor_id' => $donorId,
-                ':event_id' => $eventId,
-                ':type' => $type,
-                ':amount' => $amount,
-                ':date' => $date,
+                ':donor_id' => (int)$donorId,
+                ':event_id' => $eventId ? (int)$eventId : null,
+                ':type' => (string)$type,
+                ':amount' => (float)$amount,
+                ':date' => (string)$date,
             ];
+
+
     
             $result = $this->db->execute($query, $params);
+
     
             if ($result) {
                 header('Location: index.php?controller=donor&action=viewDonations');

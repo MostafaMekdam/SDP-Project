@@ -39,9 +39,19 @@ class Database {
 
     // Execute method for insert, update, delete operations
     public function execute($sql, $params = []) {
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute($params);  // Return true if the query executes successfully
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $result = $stmt->execute($params);
+            // Debugging
+            if (!$result) {
+                print_r($stmt->errorInfo()); // Show PDO error info
+            }
+            return $result;
+        } catch (PDOException $e) {
+            die("Database execute error: " . $e->getMessage());
+        }
     }
+    
 
     public function lastInsertId() {
         return $this->pdo->lastInsertId();
