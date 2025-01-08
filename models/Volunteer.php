@@ -5,6 +5,12 @@ require_once 'config/Database.php';
 class Volunteer implements Observer {
     private $db;
 
+    public $volunteer_id;
+    public $name;
+    public $contact_info;
+    public $availability;
+    public $user_id;
+
     public function __construct() {
         // Use the Singleton Database instance
         $this->db = Database::getInstance();
@@ -17,8 +23,23 @@ class Volunteer implements Observer {
 
     public function getVolunteerByUserId($userId) {
         $query = "SELECT * FROM Volunteer WHERE user_id = :user_id";
-        return $this->db->query($query, [':user_id' => $userId])[0] ?? null;
+        $result = $this->db->query($query, [':user_id' => $userId]);
+    
+        if (count($result) === 0) {
+            return null; // No volunteer found
+        }
+    
+        // Populate the current Volunteer object instead of creating a new one
+        $this->volunteer_id = $result[0]['volunteer_id'];
+        $this->name = $result[0]['name'];
+        $this->contact_info = $result[0]['contact_info'];
+        $this->availability = $result[0]['availability'];
+        $this->user_id = $result[0]['user_id'];
+    
+        return $this;
     }
+    
+    
     
     
 
@@ -28,12 +49,24 @@ class Volunteer implements Observer {
         return $this->db->query($query);
     }
 
-    // Get a specific volunteer by ID
-    public function getVolunteerById($volunteerId) {
-        $query = "SELECT * FROM Volunteer WHERE volunteer_id = :volunteer_id";
-        return $this->db->query($query, [':volunteer_id' => $volunteerId])[0];
-    }
 
+    public function getSkillIds() {
+        $query = "SELECT skill_id FROM Volunteer_Skills WHERE volunteer_id = :volunteer_id";
+        $result = $this->db->query($query, [':volunteer_id' => $this->volunteer_id]);
+    
+        if (empty($result)) {
+            return []; // Return an empty array if no skills found
+        }
+    
+        return array_column($result, 'skill_id');
+    }
+    
+    
+
+   
+
+       
+    
     // Add a new volunteer
     public function addVolunteer($volunteerData) {
         $query = "INSERT INTO Volunteer (volunteer_id, name, contact_info, availability) 

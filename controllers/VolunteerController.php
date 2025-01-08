@@ -25,11 +25,13 @@ class VolunteerController {
 
         // Applying decorator pattern to add skills
         if ($result) {
-            $volunteer = $this->volunteerModel->getVolunteerById($data[':volunteer_id']);
-            $decoratedVolunteer = new SkillDecorator($volunteer);
-            $decoratedVolunteer->addSkill('First Aid');
-            $decoratedVolunteer->addSkill('CPR');
-            $decoratedVolunteer->displaySkills();
+            $volunteer = $this->volunteerModel->getVolunteerByUserId($data[':volunteer_id']);
+
+            if ($volunteer === null) {
+                echo "Volunteer not found.";
+                return;
+            }
+            
             echo "Volunteer added successfully.";
         } else {
             echo "Error adding volunteer.";
@@ -38,7 +40,7 @@ class VolunteerController {
 
     // Retrieves volunteer information
     public function getVolunteer($volunteerId) {
-        $volunteer = $this->volunteerModel->getVolunteerById($volunteerId);
+        $volunteer = $this->volunteerModel->getVolunteerByUserId($volunteerId);
         require 'views/volunteer/view.php';
     }
 
@@ -56,22 +58,99 @@ class VolunteerController {
     }
 
 
-    public function addSkills() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $volunteerId = $_SESSION['user_id']; // Ensure the volunteer is logged in
-            $volunteer = $this->volunteerModel->getVolunteerById($volunteerId);
+        // Displays logged-in volunteer's skills
+        public function viewSkills() {
+            $userId = $_SESSION['user_id'];
     
-            // Apply decorator pattern to add skills
+            // Fetch volunteer by user_id
+            $volunteer = $this->volunteerModel->getVolunteerByUserId($userId);
+    
+            if (!$volunteer) {
+                echo "Error: Volunteer not found.";
+                return;
+            }
+    
             $decoratedVolunteer = new SkillDecorator($volunteer);
-            $decoratedVolunteer->addSkill('First Aid');
-            $decoratedVolunteer->addSkill('CPR');
-            $decoratedVolunteer->displaySkills();
+            $skills = $decoratedVolunteer->getSkills();
     
-            echo "Skills added successfully.";
-        } else {
-            include 'views/volunteer/add_skills.php'; // Create this view
+            // Pass data to the view
+            include 'views/volunteer/view_skills.php';
         }
-    }
+    
+        // Displays the choose_skills.php view
+        public function chooseSkills() {
+            $userId = $_SESSION['user_id'];
+    
+            // Get the volunteer by user ID
+            $volunteer = $this->volunteerModel->getVolunteerByUserId($userId);
+    
+            if (!$volunteer) {
+                echo "Error: Volunteer not found.";
+                return;
+            }
+    
+            // Fetch all available skills
+            $query = "SELECT * FROM Skill";
+            $skills = $this->db->query($query);
+    
+            if (empty($skills)) {
+                echo "Error: No skills available.";
+                return;
+            }
+    
+            // Include the view and pass data to it
+            $volunteerSkills = $volunteer->getSkillIds();
+            include 'views/volunteer/choose_skills.php';
+        }
+    
+        // Assign skills to the logged-in volunteer
+        public function assignSkills() {
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $userId = $_SESSION['user_id'];
+    
+                // Get the volunteer by user ID
+                $volunteer = $this->volunteerModel->getVolunteerByUserId($userId);
+    
+                if (!$volunteer) {
+                    echo "Error: Volunteer not found.";
+                    return;
+                }
+    
+                // Get selected skills from the form
+                $selectedSkills = $_POST['skills'] ?? [];
+    
+                // Fetch valid skill IDs from the database
+                $query = "SELECT skill_id FROM Skill";
+                $validSkills = $this->db->query($query);
+                $validSkillIds = array_column($validSkills, 'skill_id');
+    
+                // Validate selected skills
+                $validSelectedSkills = array_intersect($selectedSkills, $validSkillIds);
+    
+                // Clear existing skills
+                $query = "DELETE FROM Volunteer_Skills WHERE volunteer_id = :volunteer_id";
+                $this->db->execute($query, [':volunteer_id' => $volunteer->volunteer_id]);
+    
+                // Assign new skills
+                foreach ($validSelectedSkills as $skillId) {
+                    $query = "INSERT INTO Volunteer_Skills (volunteer_id, skill_id) VALUES (:volunteer_id, :skill_id)";
+                    $params = [
+                        ':volunteer_id' => $volunteer->volunteer_id,
+                        ':skill_id' => $skillId,
+                    ];
+                    $this->db->execute($query, $params);
+                }
+    
+                echo "Skills updated successfully.";
+                header("Location: index.php?controller=volunteer&action=viewSkills");
+                exit;
+            }
+        }
+    
+    
+    
+    
+    
 
     
 }
