@@ -39,13 +39,13 @@ class Event implements Subject {
         $query = "INSERT INTO event (name, date, location, capacity) 
                   VALUES (:name, :date, :location, :capacity)";
         $result = $this->db->execute($query, $data);
-
+    
         if ($result) {
             $this->notifyObservers();
         }
-
+    
         return $result;
-    }
+    }    
 
     public function getEvents() {
         $query = "SELECT * FROM event";

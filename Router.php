@@ -30,9 +30,9 @@ class Router {
 
         $queryParams = $_GET;
         unset($queryParams['controller'], $queryParams['action']); // Remove reserved parameters
-        $mergedParams = array_merge($queryParams, $params);
+        $mergedParams = array_merge($queryParams, $params); // Merge extra params
 
-        $orderedParams = array_values($mergedParams);
+        $orderedParams = [$mergedParams]; // Modify here to wrap parameters in an array
 
         call_user_func_array([$controllerInstance, $action], $orderedParams);
     }
