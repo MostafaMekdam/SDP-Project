@@ -38,14 +38,20 @@ class Event implements Subject {
     public function addEvent($data) {
         $query = "INSERT INTO event (name, date, location, capacity) 
                   VALUES (:name, :date, :location, :capacity)";
-        $result = $this->db->execute($query, $data);
-    
+        $stmt = $this->db->prepare($query);
+        
+        // Bind parameters explicitly
+        $stmt->bindParam(':name', $data['name'], PDO::PARAM_STR);
+        $stmt->bindParam(':date', $data['date'], PDO::PARAM_STR);
+        $stmt->bindParam(':location', $data['location'], PDO::PARAM_STR);
+        $stmt->bindParam(':capacity', $data['capacity'], PDO::PARAM_INT);
+        
+        $result = $stmt->execute();
         if ($result) {
             $this->notifyObservers();
         }
-    
         return $result;
-    }    
+    }
 
     public function getEvents() {
         $query = "SELECT * FROM event";

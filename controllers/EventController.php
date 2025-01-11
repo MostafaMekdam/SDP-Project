@@ -21,14 +21,23 @@ class EventController {
     }
 
     // Adds a new event
-    public function store($data) {
-        $result = $this->eventModel->addEvent($data);
+
+    public function store() {
+        $eventData = [
+            'name' => $_POST['name'],
+            'date' => $_POST['date'],
+            'location' => $_POST['location'],
+            'capacity' => $_POST['capacity']
+        ];
+        var_dump($eventData); // Debug to ensure data is correct
+        $result = $this->eventModel->addEvent($eventData);
         if ($result) {
             echo "Event created successfully.";
         } else {
             echo "Error creating event.";
         }
     }
+
 
     // Retrieves event information
     public function view($eventId) {

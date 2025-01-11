@@ -42,14 +42,17 @@ class Database {
         try {
             $stmt = $this->pdo->prepare($sql);
             $result = $stmt->execute($params);
-            // Debugging
             if (!$result) {
-                print_r($stmt->errorInfo()); // Show PDO error info
+                print_r($stmt->errorInfo()); // Print error information
             }
             return $result;
         } catch (PDOException $e) {
             die("Database execute error: " . $e->getMessage());
         }
+    }
+
+    public function prepare($sql) {
+        return $this->pdo->prepare($sql);
     }
     
 
