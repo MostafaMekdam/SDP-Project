@@ -1,4 +1,5 @@
-<form method="post" action="/volunteer/addVolunteer">
+<h2>Add New Volunteer</h2>
+<form action="/index.php" method="post">
     <label>Volunteer Id:</label>
     <input type="text" name="volunteer_id" required>
     <br>
@@ -13,3 +14,6 @@
     <br>
     <button type="submit">Add Volunteer</button>
 </form>
+
+
+

@@ -5,7 +5,7 @@
 </head>
 <body>
     <h1>Volunteers</h1>
-    <a href="/volunteer/add">Add New Volunteer</a>
+    <a href="views\volunteer\add.php">Add New Volunteer</a>
     <table>
         <tr>
             <th>ID</th>
@@ -15,11 +15,13 @@
             <th>Availability</th>
             <th>Actions</th>
         </tr>
+
         <?php if (!empty($volunteers)) : ?>
             <?php foreach ($volunteers as $volunteer): ?>
+           
             <tr>
                 <td><?= htmlspecialchars($volunteer['volunteer_id']) ?></td>
-                <td><?= htmlspecialchars($volunteer['person_id']) ?></td>
+                <td> <?php echo $array['person_id'] ?? "Person ID not available"; ?></td>
                 <td><?= htmlspecialchars($volunteer['name']) ?></td>
                 <td><?= htmlspecialchars($volunteer['contact_info']) ?></td>
                 <td><?= $volunteer['availability'] ? 'Available' : 'Not Available' ?></td>
