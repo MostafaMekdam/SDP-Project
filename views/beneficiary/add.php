@@ -5,7 +5,7 @@
 </head>
 <body>
     <h1>Add New Beneficiary</h1>
-    <form method="post" action="/beneficiary/add">
+    <form method="post" action="index.php?controller=beneficiary&action=addBeneficiary">
         <label>Name:</label>
         <input type="text" name="name" required>
         <br>

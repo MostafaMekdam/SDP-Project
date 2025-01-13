@@ -78,7 +78,7 @@ function displayUserControlPanel() {
 // Main Logic
 $controller = $_GET['controller'] ?? null;
 $action = $_GET['action'] ?? null;
-$params = array_slice($_GET, 2);
+$params = ($_SERVER['REQUEST_METHOD'] === 'POST') ? $_POST : $_GET;
 
 if ($controller && $action) {
     $router->route($controller, $action, $params);
