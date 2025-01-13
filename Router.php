@@ -31,14 +31,23 @@ class Router
             return;
         }
 
+        // Merge GET and custom params
         $queryParams = $_GET;
         unset($queryParams['controller'], $queryParams['action']); // Remove reserved parameters
+
+        // Include 'id' parameter if it's in the query string
         if (isset($queryParams['id'])) {
-            $params['id'] = $queryParams['id']; // Add `id` from the query string to the params array
+            $params['id'] = $queryParams['id'];
         }
+
         $mergedParams = array_merge($queryParams, $params);
-        $orderedParams = [$mergedParams]; // Wrap parameters in an array for the controller
-        call_user_func_array([$controllerInstance, $action], $orderedParams);
+
+        // Call the controller action with ordered parameters
+        try {
+            call_user_func_array([$controllerInstance, $action], [$mergedParams]);
+        } catch (Exception $e) {
+            $this->error("An error occurred: " . $e->getMessage());
+        }
     }
 
     private function error(string $message)

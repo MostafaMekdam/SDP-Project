@@ -23,8 +23,8 @@
                 <td><?= htmlspecialchars($event['date']) ?></td>
                 <td><?= htmlspecialchars($event['location']) ?></td>
                 <td>
-                    <a href="index.php?controller=event&action=view&id=<?= $event['event_id'] ?>">View</a>
-                    <a href="index.php?controller=event&action=edit&id=<?= $event['event_id'] ?>">Edit</a>
+                    <a href="index.php?controller=event&action=view&id=<?= urlencode($event['event_id']) ?>">View</a>
+                    <a href="index.php?controller=event&action=edit&id=<?= urlencode($event['event_id']) ?>">Edit</a>
                 </td>
             </tr>
         <?php endforeach; ?>

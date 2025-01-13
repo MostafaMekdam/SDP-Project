@@ -42,16 +42,20 @@ class EventController {
 
 
     // Retrieves event information
-    public function view($eventId) {
+    public function view($params) {
+        if (!isset($params['id']) || empty($params['id'])) {
+            die("An error occurred: Invalid event ID provided.");
+        }
+    
+        $eventId = (int)$params['id'];
         $event = $this->eventModel->getEventById($eventId);
     
         if ($event === null) {
-            echo "Event not found.";
-            return;
+            die("An error occurred: Event not found.");
         }
     
         require 'views/event/view.php';
-    }    
+    }          
 
     // Updates an event’s details
     public function update($eventId, $data) {
@@ -83,10 +87,20 @@ class EventController {
     }
 
     // Display edit event form
-    public function edit($eventId) {
+    public function edit($params) {
+        if (!isset($params['id']) || empty($params['id'])) {
+            die("An error occurred: Invalid event ID provided.");
+        }
+    
+        $eventId = (int)$params['id'];
         $event = $this->eventModel->getEventById($eventId);
+    
+        if ($event === null) {
+            die("An error occurred: Event not found.");
+        }
+    
         require 'views/event/edit.php';
-    }
+    }    
 
     // Register an attendee (volunteer or donor) for an event
     public function register() {

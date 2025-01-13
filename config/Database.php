@@ -32,10 +32,14 @@ class Database {
 
     // Query method to select data
     public function query($sql, $params = []) {
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Database query error: " . $e->getMessage());
+        }
+    }     
 
     // Execute method for insert, update, delete operations
     public function execute($sql, $params = []) {

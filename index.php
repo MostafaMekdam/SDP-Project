@@ -81,6 +81,9 @@ $action = $_GET['action'] ?? null;
 $params = ($_SERVER['REQUEST_METHOD'] === 'POST') ? $_POST : $_GET;
 
 try {
+    // Debugging log for route parameters
+    error_log("Received Parameters: " . print_r($params, true));
+
     if ($controller && $action) {
         $router->route($controller, $action, $params);
     } elseif (isLoggedIn()) {
@@ -92,4 +95,5 @@ try {
     // Handle exceptions gracefully
     http_response_code(500);
     echo "<h1>Internal Server Error</h1><p>" . htmlspecialchars($e->getMessage()) . "</p>";
+    error_log("Exception: " . $e->getMessage());
 }
