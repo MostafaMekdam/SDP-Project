@@ -5,7 +5,7 @@
 </head>
 <body>
     <h1>Edit Beneficiary</h1>
-    <form method="post" action="/beneficiary/edit/<?= $beneficiary['beneficiary_id'] ?>">
+    <form method="post" action="index.php?controller=beneficiary&action=updateBeneficiary&id=<?= htmlspecialchars($beneficiary['beneficiary_id']) ?>">
         <label>Name:</label>
         <input type="text" name="name" value="<?= htmlspecialchars($beneficiary['name']) ?>" required>
         <br>

@@ -23,18 +23,43 @@ class BeneficiaryController
     
         if ($result) {
             // Redirect to the beneficiary list page
-            header("Location: index.php?controller=beneficiary&action=listBeneficiaries");
+            header("Location: ?controller=beneficiary&action=listBeneficiaries");
             exit;
         } else {
             echo "Error adding beneficiary.";
         }
     }
 
-    // Retrieves beneficiary information
-    public function getBeneficiary($beneficiaryId)
+    // Displays the details of a specific beneficiary
+    public function view($params)
     {
-        $beneficiary = $this->beneficiaryModel->getBeneficiaryById($beneficiaryId);
-        require 'views/beneficiary/view.php'; // Display beneficiary details
+        $beneficiaryId = $params['id'] ?? null;
+        if ($beneficiaryId) {
+            $beneficiary = $this->beneficiaryModel->getBeneficiaryById($beneficiaryId);
+            if ($beneficiary) {
+                require 'views/beneficiary/view.php'; // Render the view beneficiary page
+            } else {
+                echo "Beneficiary not found.";
+            }
+        } else {
+            echo "Invalid beneficiary ID.";
+        }
+    }
+
+    // Displays the form to edit a specific beneficiary
+    public function edit($params)
+    {
+        $beneficiaryId = $params['id'] ?? null;
+        if ($beneficiaryId) {
+            $beneficiary = $this->beneficiaryModel->getBeneficiaryById($beneficiaryId);
+            if ($beneficiary) {
+                require 'views/beneficiary/edit.php'; // Render the edit beneficiary page
+            } else {
+                echo "Beneficiary not found.";
+            }
+        } else {
+            echo "Invalid beneficiary ID.";
+        }
     }
 
     // Updates a beneficiary’s details
