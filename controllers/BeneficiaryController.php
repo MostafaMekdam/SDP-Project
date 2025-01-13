@@ -63,11 +63,19 @@ class BeneficiaryController
     }
 
     // Updates a beneficiary’s details
-    public function updateBeneficiary($beneficiaryId, $data)
-    {
+    public function updateBeneficiary($data) {
+        $beneficiaryId = $data['id']; // Extract the ID from the $data array
+        unset($data['id']); // Remove ID from the array, as it's not part of the update fields
+    
         $result = $this->beneficiaryModel->updateBeneficiary($beneficiaryId, $data);
-        echo $result ? "Beneficiary updated successfully." : "Error updating beneficiary.";
-    }
+        if ($result) {
+            // Redirect back to the beneficiary list
+            header("Location: ?controller=beneficiary&action=listBeneficiaries");
+            exit;
+        } else {
+            echo "Error updating beneficiary.";
+        }
+    }    
 
     // List all beneficiaries
     public function listBeneficiaries()

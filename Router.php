@@ -1,13 +1,16 @@
 <?php
 
-class Router {
+class Router
+{
     private $routes;
 
-    public function __construct(array $routes) {
+    public function __construct(array $routes)
+    {
         $this->routes = $routes;
     }
 
-    public function route(string $controller, string $action, array $params = []) {
+    public function route(string $controller, string $action, array $params = [])
+    {
         $controller = htmlspecialchars($controller);
         $action = htmlspecialchars($action);
 
@@ -30,14 +33,16 @@ class Router {
 
         $queryParams = $_GET;
         unset($queryParams['controller'], $queryParams['action']); // Remove reserved parameters
-        $mergedParams = array_merge($queryParams, $params); // Merge extra params
-
-        $orderedParams = [$mergedParams]; // Modify here to wrap parameters in an array
-
+        if (isset($queryParams['id'])) {
+            $params['id'] = $queryParams['id']; // Add `id` from the query string to the params array
+        }
+        $mergedParams = array_merge($queryParams, $params);
+        $orderedParams = [$mergedParams]; // Wrap parameters in an array for the controller
         call_user_func_array([$controllerInstance, $action], $orderedParams);
     }
 
-    private function error(string $message) {
+    private function error(string $message)
+    {
         http_response_code(404);
         echo "<h1>Error</h1><p>$message</p>";
     }
