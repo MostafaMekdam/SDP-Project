@@ -6,7 +6,7 @@
 <body>
     <h2>Edit Event</h2>
     <?php if ($event): ?>
-        <form action="index.php?controller=event&action=update&id=<?= $event['event_id'] ?>" method="POST">
+        <form action="index.php?controller=event&action=update&id=<?= htmlspecialchars($event['event_id']) ?>" method="POST">
             <label for="name">Event Name:</label>
             <input type="text" name="name" id="name" value="<?= htmlspecialchars($event['name']) ?>" required><br>
 

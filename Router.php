@@ -44,7 +44,12 @@ class Router
 
         // Call the controller action with ordered parameters
         try {
-            call_user_func_array([$controllerInstance, $action], [$mergedParams]);
+            if ($action === 'update' && isset($mergedParams['id'])) {
+                // Pass 'id' and other parameters to update action
+                call_user_func_array([$controllerInstance, $action], [$mergedParams['id'], $_POST]);
+            } else {
+                call_user_func_array([$controllerInstance, $action], [$mergedParams]);
+            }
         } catch (Exception $e) {
             $this->error("An error occurred: " . $e->getMessage());
         }
