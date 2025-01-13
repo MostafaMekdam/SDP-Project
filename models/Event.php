@@ -60,9 +60,9 @@ class Event implements Subject {
 
     public function getEventById($eventId) {
         $query = "SELECT * FROM event WHERE event_id = :event_id";
-        $result = $this->db->query($query, ['event_id' => $eventId]);
-        return $result !== false && count($result) > 0 ? $result[0] : null; // Return the first result or null if no result is found
-    }
+        $result = $this->db->query($query, [':event_id' => $eventId]); // Correct key ':event_id'
+        return $result !== false && count($result) > 0 ? $result[0] : null; // Return first result or null
+    }       
 
     public function updateEvent($eventId, $data) {
         $query = "UPDATE event 

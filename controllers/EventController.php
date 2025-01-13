@@ -29,21 +29,29 @@ class EventController {
             'location' => $_POST['location'],
             'capacity' => $_POST['capacity']
         ];
-        var_dump($eventData); // Debug to ensure data is correct
+    
         $result = $this->eventModel->addEvent($eventData);
         if ($result) {
-            echo "Event created successfully.";
+            // Redirect to the event list page after successful creation
+            header("Location: index.php?controller=event&action=list");
+            exit;
         } else {
             echo "Error creating event.";
         }
-    }
+    }    
 
 
     // Retrieves event information
     public function view($eventId) {
         $event = $this->eventModel->getEventById($eventId);
+    
+        if ($event === null) {
+            echo "Event not found.";
+            return;
+        }
+    
         require 'views/event/view.php';
-    }
+    }    
 
     // Updates an event’s details
     public function update($eventId, $data) {

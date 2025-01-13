@@ -21,7 +21,10 @@
             <td><?= htmlspecialchars($event['date']) ?></td>
             <td><?= htmlspecialchars($event['location']) ?></td>
             <td>
-                <a href="index.php?controller=event&action=register&event_id=<?= $event['event_id'] ?>">Register</a>
+            <a href="index.php?controller=event&action=register&event_id=<?= $event['event_id'] ?>"
+                        onclick="return confirm('Are you sure you want to register for this event?')">
+                        Register
+                    </a>
             </td>
         </tr>
         <?php endforeach; ?>

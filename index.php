@@ -80,10 +80,16 @@ $controller = $_GET['controller'] ?? null;
 $action = $_GET['action'] ?? null;
 $params = ($_SERVER['REQUEST_METHOD'] === 'POST') ? $_POST : $_GET;
 
-if ($controller && $action) {
-    $router->route($controller, $action, $params);
-} elseif (isLoggedIn()) {
-    displayUserControlPanel();
-} else {
-    redirectToLogin();
+try {
+    if ($controller && $action) {
+        $router->route($controller, $action, $params);
+    } elseif (isLoggedIn()) {
+        displayUserControlPanel();
+    } else {
+        redirectToLogin();
+    }
+} catch (Exception $e) {
+    // Handle exceptions gracefully
+    http_response_code(500);
+    echo "<h1>Internal Server Error</h1><p>" . htmlspecialchars($e->getMessage()) . "</p>";
 }
