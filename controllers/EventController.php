@@ -110,7 +110,6 @@ class EventController {
         require 'views/event/edit.php';
     }    
 
-    // Register an attendee (volunteer or donor) for an event
     public function register() {
         if (isset($_GET['event_id'])) {
             $eventId = $_GET['event_id'];
@@ -124,19 +123,30 @@ class EventController {
                     ':user_id' => $userId,
                 ]);
     
-                // Step 2: Register the volunteer as an attendee
-                $attendeeQuery = "INSERT INTO Attendee (ticket_status) VALUES (1)";
-                $this->db->execute($attendeeQuery);
-                $attendeeId = $this->db->lastInsertId(); // Retrieve the new attendee ID
+                // Step 2: Check if the user is already a volunteer
+                $volunteerQuery = "SELECT volunteer_id FROM Volunteer WHERE user_id = :user_id";
+                $volunteer = $this->db->query($volunteerQuery, [':user_id' => $userId]);
     
-                // Step 3: Link attendee with the event
+                if (!$volunteer) {
+                    throw new Exception("The logged-in user is not a volunteer.");
+                }
+    
+                $volunteerId = $volunteer[0]['volunteer_id']; // Retrieve the volunteer ID
+    
+                // Step 3: Ensure the attendee exists in the Attendee table
+                $attendeeQuery = "INSERT IGNORE INTO Attendee (attendee_id, ticket_status) VALUES (:attendee_id, 1)";
+                $this->db->execute($attendeeQuery, [
+                    ':attendee_id' => $volunteerId,
+                ]);
+    
+                // Step 4: Link the attendee to the event
                 $eventAttendeeQuery = "INSERT INTO Event_Attendees (event_id, attendee_id) VALUES (:event_id, :attendee_id)";
                 $this->db->execute($eventAttendeeQuery, [
                     ':event_id' => $eventId,
-                    ':attendee_id' => $attendeeId,
+                    ':attendee_id' => $volunteerId,
                 ]);
     
-                // Step 4: Add a notification to the volunteer's inbox
+                // Step 5: Add a notification to the volunteer's inbox
                 $notificationQuery = "INSERT INTO Inbox (user_id, message) VALUES (:user_id, :message)";
                 $message = "You have successfully registered for Event ID: $eventId and will receive updates.";
                 $this->db->execute($notificationQuery, [
@@ -152,6 +162,8 @@ class EventController {
             echo "Error: Event ID is missing.";
         }
     }
+    
+    
 
     public function listAttendees() {
         if (isset($_GET['event_id'])) {
@@ -176,9 +188,38 @@ class EventController {
             echo "Event ID is missing.";
         }
     }
-    
-    
-    
+
+
+       // List volunteers for a specific event
+    public function listVolunteers() {
+        if (isset($_GET['event_id'])) {
+            $eventId = (int)$_GET['event_id'];
+
+            try {
+                // Step 1: Validate event existence
+                $event = $this->eventModel->getEventById($eventId);
+                if (!$event) {
+                    throw new Exception("The event does not exist.");
+                }
+
+                // Step 2: Fetch the list of volunteers attending the event
+                $query = "
+                    SELECT Volunteer.name, Volunteer.contact_info 
+                    FROM Event_Attendees
+                    JOIN Volunteer ON Volunteer.volunteer_id = Event_Attendees.attendee_id
+                    WHERE Event_Attendees.event_id = :event_id
+                ";
+                $volunteers = $this->db->query($query, [':event_id' => $eventId]);
+
+                // Include the view
+                include 'views/event/volunteer_attendees.php';
+            } catch (Exception $e) {
+                echo "Error: " . $e->getMessage();
+            }
+        } else {
+            echo "Error: Event ID is missing.";
+        }
+    }
     
     
 }

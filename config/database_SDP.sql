@@ -1,3 +1,19 @@
+CREATE TABLE users (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('Admin', 'Donor', 'Volunteer') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Event (
+    event_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100),
+    date DATE,
+    location VARCHAR(100),
+    capacity INT
+);
+
 CREATE TABLE Donor (
     donor_id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
@@ -14,9 +30,6 @@ CREATE TABLE Volunteer (
     user_id INT UNIQUE,
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
-
-
-
 
 CREATE TABLE Beneficiary (
     beneficiary_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -36,17 +49,9 @@ CREATE TABLE Donation (
     type VARCHAR(50),
     amount DECIMAL(10, 2) NOT NULL,
     date DATETIME NOT NULL,
-    FOREIGN KEY (donor_id) REFERENCES Donor(donor_id),
     event_id INT DEFAULT NULL,
+    FOREIGN KEY (donor_id) REFERENCES Donor(donor_id),
     FOREIGN KEY (event_id) REFERENCES Event(event_id)
-);
-
-CREATE TABLE Event (
-    event_id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(100),
-    date DATE,
-    location VARCHAR(100),
-    capacity INT
 );
 
 CREATE TABLE Receipt (
@@ -102,11 +107,11 @@ CREATE TABLE Volunteer_Skills (
 );
 
 CREATE TABLE Event_Attendees (
-    event_id INT,
-    attendee_id INT,
+    event_id INT NOT NULL,
+    attendee_id INT NOT NULL,
+    PRIMARY KEY (event_id, attendee_id),
     FOREIGN KEY (event_id) REFERENCES Event(event_id),
-    FOREIGN KEY (attendee_id) REFERENCES Attendee(attendee_id),
-    PRIMARY KEY (event_id, attendee_id)
+    FOREIGN KEY (attendee_id) REFERENCES Attendee(attendee_id)
 );
 
 CREATE TABLE VolunteerTask_Volunteers (
@@ -116,14 +121,6 @@ CREATE TABLE VolunteerTask_Volunteers (
     FOREIGN KEY (volunteer_id) REFERENCES Volunteer(volunteer_id),
     PRIMARY KEY (task_id, volunteer_id)
 );
-CREATE TABLE users (
-    user_id INT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    role ENUM('Admin', 'Donor', 'Volunteer') NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 
 CREATE TABLE Inbox (
     inbox_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -143,7 +140,3 @@ CREATE TABLE Event_Observers (
     FOREIGN KEY (user_id) REFERENCES users(user_id),
     PRIMARY KEY (event_id, user_id)
 );
-
-
-
-

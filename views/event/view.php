@@ -15,5 +15,7 @@
         <p>Event not found.</p>
     <?php endif; ?>
     <a href="index.php?controller=event&action=list">Back to Events List</a>
+    <a href="index.php?controller=event&action=listVolunteers&event_id=<?= htmlspecialchars($event['event_id']) ?>">View Volunteer Attendees</a>
+
 </body>
 </html>

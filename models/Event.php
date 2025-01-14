@@ -86,11 +86,17 @@ class Event implements Subject {
     }
 
     public function getAttendeeIterator(int $eventId): EventAttendeeIterator {
-        $query = "SELECT * FROM Attendee 
-                  JOIN Event_Attendees ON Attendee.attendee_id = Event_Attendees.attendee_id 
-                  WHERE Event_Attendees.event_id = :event_id";
+        $query = "
+            SELECT Volunteer.name, Volunteer.contact_info 
+            FROM Event_Attendees
+            JOIN Attendee ON Attendee.attendee_id = Event_Attendees.attendee_id
+            JOIN Volunteer ON Volunteer.volunteer_id = Attendee.attendee_id
+            WHERE Event_Attendees.event_id = :event_id
+        ";
         $attendees = $this->db->query($query, [':event_id' => $eventId]);
         return new EventAttendeeIterator($attendees);
     }
+    
+    
 }
 ?>
