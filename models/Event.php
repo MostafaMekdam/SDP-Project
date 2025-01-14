@@ -23,9 +23,19 @@ class Event implements Subject {
         }
     }
 
-    public function notifyObservers() {
-        foreach ($this->observers as $observer) {
-            $observer->update($this->getLastEventData());
+    public function notifyObservers($eventId, $message) {
+        // Get all observers (users) registered for the event
+        $query = "SELECT user_id FROM Event_Observers WHERE event_id = :event_id";
+        $observers = $this->db->query($query, [':event_id' => $eventId]);
+
+        // Write notifications to the inbox table for all observers
+        foreach ($observers as $observer) {
+            $inboxQuery = "INSERT INTO Inbox (user_id, message, event_id) VALUES (:user_id, :message, :event_id)";
+            $this->db->execute($inboxQuery, [
+                ':user_id' => $observer['user_id'],
+                ':message' => $message,
+                ':event_id' => $eventId,
+            ]);
         }
     }
 
@@ -38,17 +48,11 @@ class Event implements Subject {
     public function addEvent($data) {
         $query = "INSERT INTO event (name, date, location, capacity) 
                   VALUES (:name, :date, :location, :capacity)";
-        $stmt = $this->db->prepare($query);
-        
-        // Bind parameters explicitly
-        $stmt->bindParam(':name', $data['name'], PDO::PARAM_STR);
-        $stmt->bindParam(':date', $data['date'], PDO::PARAM_STR);
-        $stmt->bindParam(':location', $data['location'], PDO::PARAM_STR);
-        $stmt->bindParam(':capacity', $data['capacity'], PDO::PARAM_INT);
-        
-        $result = $stmt->execute();
+        $result = $this->db->execute($query, $data);
+
         if ($result) {
-            $this->notifyObservers();
+            $eventId = $this->db->lastInsertId();
+            $this->notifyObservers($eventId, "A new event '{$data['name']}' has been added.");
         }
         return $result;
     }
@@ -62,13 +66,18 @@ class Event implements Subject {
         $query = "SELECT * FROM event WHERE event_id = :event_id";
         $result = $this->db->query($query, [':event_id' => $eventId]);
         return $result !== false && count($result) > 0 ? $result[0] : null;
-    }          
+    }        
 
     public function updateEvent($eventId, $data) {
         $query = "UPDATE event 
                   SET name = :name, date = :date, location = :location, capacity = :capacity
                   WHERE event_id = :event_id";
-        return $this->db->execute($query, array_merge($data, ['event_id' => $eventId]));
+        $result = $this->db->execute($query, array_merge($data, ['event_id' => $eventId]));
+
+        if ($result) {
+            $this->notifyObservers($eventId, "Event '{$data['name']}' has been updated.");
+        }
+        return $result;
     }
 
     public function deleteEvent($eventId) {

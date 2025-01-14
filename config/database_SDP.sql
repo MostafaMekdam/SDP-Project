@@ -123,3 +123,27 @@ CREATE TABLE users (
     role ENUM('Admin', 'Donor', 'Volunteer') NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+CREATE TABLE Inbox (
+    inbox_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    message TEXT NOT NULL,
+    event_id INT,
+    is_read BOOLEAN DEFAULT 0,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (event_id) REFERENCES Event(event_id)
+);
+
+CREATE TABLE Event_Observers (
+    event_id INT NOT NULL,
+    user_id INT NOT NULL,
+    FOREIGN KEY (event_id) REFERENCES Event(event_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    PRIMARY KEY (event_id, user_id)
+);
+
+
+
+

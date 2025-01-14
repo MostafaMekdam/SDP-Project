@@ -1,6 +1,6 @@
 <?php
 require_once 'models/Volunteer.php';
-require_once "C:\xampp\htdocs\projects\MVC\SDP-Project\VolunteerDecorators.php";
+require_once __DIR__ . '/../VolunteerDecorators.php';
 
 class VolunteerController {
     private $volunteerModel;
@@ -50,6 +50,20 @@ class VolunteerController {
         $result = $this->volunteerModel->updateVolunteer($data);
         echo $result ? "Volunteer updated successfully." : "Error updating volunteer.";
     }
+
+    public function viewInbox() {
+        $userId = $_SESSION['user_id']; // Get the logged-in user ID
+    
+        // Fetch notifications
+        $query = "SELECT * FROM Inbox WHERE user_id = :user_id ORDER BY timestamp DESC";
+        $notifications = $this->db->query($query, [':user_id' => $userId]);
+    
+        // Mark all notifications as read
+        $this->db->execute("UPDATE Inbox SET is_read = TRUE WHERE user_id = :user_id", [':user_id' => $userId]);
+    
+        include 'views/inbox.php';
+    }
+    
 
     // List all volunteers
     public function listVolunteers() {
@@ -146,6 +160,7 @@ class VolunteerController {
                 exit;
             }
         }
+
     
     
     

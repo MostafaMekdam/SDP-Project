@@ -1,17 +1,31 @@
 <?php
 require_once 'Observer.php';
+require_once 'Event.php';
 require_once 'config/Database.php';
 
 class Donor implements Observer {
     private $db;
+    public $user_id;
 
     public function __construct() {
         $this->db = Database::getInstance(); // Use Singleton for database instance
     }
 
     public function update($eventData) {
-        echo "Donor notified about event: " . $eventData['name'] . "\n";
+        $message = "Event '{$eventData['name']}' has been updated. Check the details!";
+        $query = "INSERT INTO Inbox (user_id, message) VALUES (:user_id, :message)";
+        $this->db->execute($query, [
+            ':user_id' => $this->user_id,
+            ':message' => $message,
+        ]);
     }
+
+    public function getNotifications() {
+        $query = "SELECT * FROM Inbox WHERE user_id = :user_id ORDER BY timestamp DESC";
+        return $this->db->query($query, [':user_id' => $this->user_id]);
+    }
+    
+    
 
     public function getDonors() {
         $query = "SELECT * FROM donor";

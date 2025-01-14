@@ -61,18 +61,21 @@ class DonorController {
     public function addDonation() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $donorId = $this->getLoggedInDonorId();
-
+    
+            // Verify the donor exists
             $query = "SELECT COUNT(*) AS count FROM Donor WHERE donor_id = :donor_id";
             $result = $this->db->query($query, [':donor_id' => $donorId]);
             if ($result[0]['count'] == 0) {
                 echo "Error: Donor does not exist. Please contact the administrator.";
                 return;
             }
+    
             $type = $_POST['type'];
             $amount = $_POST['amount'];
             $eventId = $_POST['event_id'] ?? null; // Optional event ID
             $date = date('Y-m-d H:i:s');
     
+            // Insert the donation record
             $query = "INSERT INTO Donation (donor_id, event_id, type, amount, date) 
                       VALUES (:donor_id, :event_id, :type, :amount, :date)";
             $params = [
@@ -82,14 +85,29 @@ class DonorController {
                 ':amount' => (float)$amount,
                 ':date' => (string)$date,
             ];
-
-
     
             $result = $this->db->execute($query, $params);
-
     
             if ($result) {
+                // Register the donor as an observer for the event if `event_id` is provided
+                if ($eventId) {
+                    $observerQuery = "INSERT IGNORE INTO Event_Observers (event_id, user_id) VALUES (:event_id, :user_id)";
+                    $this->db->execute($observerQuery, [':event_id' => $eventId, ':user_id' => $_SESSION['user_id']]);
+    
+                    // Add notification to the inbox table
+                    $notificationQuery = "INSERT INTO Inbox (user_id, message, event_id) 
+                                          VALUES (:user_id, :message, :event_id)";
+                    $notificationParams = [
+                        ':user_id' => $_SESSION['user_id'],
+                        ':message' => "Thank you for your contribution to event ID $eventId.",
+                        ':event_id' => $eventId,
+                    ];
+                    $this->db->execute($notificationQuery, $notificationParams);
+                }
+    
+                // Redirect to view donations
                 header('Location: index.php?controller=donor&action=viewDonations');
+                exit;
             } else {
                 echo "Error adding donation.";
             }
@@ -98,6 +116,8 @@ class DonorController {
             include 'views/donor/add_donation.php';
         }
     }
+    
+    
     
     
 
@@ -135,6 +155,21 @@ class DonorController {
             echo "<p>Event Location: " . htmlspecialchars($donation['event_location']) . "</p>";
         }
     }
+
+    public function viewInbox() {
+        $userId = $_SESSION['user_id']; // Get the logged-in user ID
+    
+        // Fetch notifications
+        $query = "SELECT * FROM Inbox WHERE user_id = :user_id ORDER BY timestamp DESC";
+        $notifications = $this->db->query($query, [':user_id' => $userId]);
+    
+        // Mark all notifications as read
+        $this->db->execute("UPDATE Inbox SET is_read = TRUE WHERE user_id = :user_id", [':user_id' => $userId]);
+    
+        include 'views/inbox.php';
+    }
+    
+    
     
 }
 ?>

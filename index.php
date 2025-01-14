@@ -63,9 +63,11 @@ function displayUserControlPanel() {
         case 'Donor':
             echo "<li><a href='?controller=donor&action=view'>My Donations</a></li>";
             echo "<li><a href='?controller=event&action=list'>View Events</a></li>";
+            echo "<li><a href='?controller=donor&action=viewInbox'>My Inbox</a></li>";
             break;
         case 'Volunteer':
             echo "<li><a href='?controller=event&action=list'>View Events</a></li>";
+            echo "<li><a href='?controller=volunteer&action=viewInbox'>My Inbox</a></li>";
             echo "<li><a href='?controller=volunteer&action=viewSkills'>My Skills</a></li>";
             echo "<li><a href='?controller=volunteer&action=chooseSkills'>Add Skills</a></li>";
             break;
