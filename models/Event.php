@@ -2,7 +2,7 @@
 require_once 'Subject.php'; // Include the Subject interface
 require_once 'Observer.php'; // Include the Observer interface
 require_once 'config/Database.php';
-
+require_once 'EventAttendeeIterator.php';
 
 class Event implements Subject {
     private $db;
@@ -83,6 +83,14 @@ class Event implements Subject {
     public function deleteEvent($eventId) {
         $query = "DELETE FROM event WHERE event_id = :event_id";
         return $this->db->execute($query, ['event_id' => $eventId]);
+    }
+
+    public function getAttendeeIterator(int $eventId): EventAttendeeIterator {
+        $query = "SELECT * FROM Attendee 
+                  JOIN Event_Attendees ON Attendee.attendee_id = Event_Attendees.attendee_id 
+                  WHERE Event_Attendees.event_id = :event_id";
+        $attendees = $this->db->query($query, [':event_id' => $eventId]);
+        return new EventAttendeeIterator($attendees);
     }
 }
 ?>

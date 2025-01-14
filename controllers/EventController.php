@@ -152,6 +152,32 @@ class EventController {
             echo "Error: Event ID is missing.";
         }
     }
+
+    public function listAttendees() {
+        if (isset($_GET['event_id'])) {
+            $eventId = $_GET['event_id'];
+    
+            try {
+                // Get the iterator for attendees
+                $iterator = $this->eventModel->getAttendeeIterator($eventId);
+                
+                // Convert iterator to an array for the view
+                $attendees = [];
+                foreach ($iterator as $attendee) {
+                    $attendees[] = $attendee;
+                }
+    
+                // Include the view
+                include 'views/event/attendees.php';
+            } catch (Exception $e) {
+                echo "Error: " . $e->getMessage();
+            }
+        } else {
+            echo "Event ID is missing.";
+        }
+    }
+    
+    
     
     
     
