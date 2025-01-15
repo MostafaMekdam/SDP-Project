@@ -93,12 +93,11 @@ class UserFactory {
         $volunteerData = [
             ':name' => $username,
             ':contact_info' => $extraData['contact_info'],
-            ':availability' => $extraData['availability'] ?? 0, // Default to unavailable
             ':user_id' => $userId,
         ];
     
-        $query = "INSERT INTO Volunteer (name, contact_info, availability, user_id) 
-                  VALUES (:name, :contact_info, :availability, :user_id)";
+        $query = "INSERT INTO Volunteer (name, contact_info, user_id) 
+                  VALUES (:name, :contact_info,  :user_id)";
 
 var_dump($query, $volunteerData);
 

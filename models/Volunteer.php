@@ -81,14 +81,14 @@ class Volunteer implements Observer {
     
     // Add a new volunteer
     public function addVolunteer($volunteerData) {
-        $query = "INSERT INTO Volunteer (volunteer_id, name, contact_info, availability) 
-                  VALUES (:volunteer_id, :name, :contact_info, :availability)";
+        $query = "INSERT INTO Volunteer (volunteer_id, name, contact_info) 
+                  VALUES (:volunteer_id, :name, :contact_info)";
         return $this->db->execute($query, $volunteerData);
     }
 
     // Update volunteer details
     public function updateVolunteer($volunteerData) {
-        $query = "UPDATE Volunteer SET name = :name, contact_info = :contact_info, availability = :availability 
+        $query = "UPDATE Volunteer SET name = :name, contact_info = :contact_info
                   WHERE volunteer_id = :volunteer_id";
         return $this->db->execute($query, $volunteerData);
     }
