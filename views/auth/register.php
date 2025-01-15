@@ -39,7 +39,7 @@
         <div id="contact-info-field" style="display: none;">
             <label>Contact Info:</label>
             <input type="text" name="contact_info" id="contact_info" 
-                   value="<?php echo htmlspecialchars($_POST['contact_info'] ?? ''); ?>" required><br>
+                   value="<?php echo htmlspecialchars($_POST['contact_info'] ?? ''); ?>"><br>
         </div>
 
         <button type="submit">Register</button>
