@@ -35,11 +35,17 @@ class Database {
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($params);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC); // Ensure associative array fetch
+            if (empty($result)) {
+                error_log("Query returned no results: " . $sql);
+            }
+            return $result;
         } catch (PDOException $e) {
+            error_log("Database query error: " . $e->getMessage());
             die("Database query error: " . $e->getMessage());
         }
-    }     
+    }
+     
 
     // Execute method for insert, update, delete operations
     public function execute($sql, $params = []) {
@@ -47,14 +53,19 @@ class Database {
             $stmt = $this->pdo->prepare($sql);
             $result = $stmt->execute($params);
             if (!$result) {
-                print_r($stmt->errorInfo()); // Print error information
+                echo "<pre>";
+                print_r($stmt->errorInfo());
+                echo "</pre>";
             }
+            
+            
             return $result;
         } catch (PDOException $e) {
+            error_log("PDO Exception: " . $e->getMessage());
             die("Database execute error: " . $e->getMessage());
         }
     }
-
+    
     public function prepare($sql) {
         return $this->pdo->prepare($sql);
     }

@@ -1,5 +1,6 @@
 <?php
 require_once 'models/Donor.php';
+require_once 'ReceiptTemplate.php';
 
 class DonorController {
     private $donorModel;
@@ -117,9 +118,6 @@ class DonorController {
         }
     }
     
-    
-    
-    
 
     public function viewDonations() {
         $donorId = $this->getLoggedInDonorId();
@@ -128,33 +126,57 @@ class DonorController {
         $query = "SELECT * FROM Donation WHERE donor_id = :donor_id";
         $donations = $this->db->query($query, [':donor_id' => $donorId]);
     
+        if (empty($donations)) {
+            echo "<p>You have no donations yet. Start donating today!</p>";
+            return;
+        }
+    
         include 'views/donor/view_donations.php';
     }
+    
+
+
 
     public function downloadReceipt($donationId) {
+        if (is_array($donationId)) {
+            $donationId = $donationId['donationId'] ?? null;
+        }
+    
+        if (!$donationId || !is_numeric($donationId)) {
+            echo "Error: Invalid Donation ID.";
+            return;
+        }
+    
+        error_log("Donation ID: " . $donationId);
+    
         $query = "SELECT d.*, e.name AS event_name, e.date AS event_date, e.location AS event_location 
                   FROM Donation d
                   LEFT JOIN Event e ON d.event_id = e.event_id
                   WHERE d.donation_id = :donation_id";
-        $donation = $this->db->query($query, [':donation_id' => $donationId])[0] ?? null;
     
-        if (!$donation) {
-            echo "Donation not found.";
+        $result = $this->db->query($query, [':donation_id' => $donationId]);
+        error_log("Query Result: " . print_r($result, true));
+    
+        if (empty($result)) {
+            echo "Error: Donation not found.";
             return;
         }
     
+        $donation = $result[0];
+        error_log("Donation Data: " . print_r($donation, true));
+    
+        $receiptGenerator = $donation['event_id'] ? new EventDonationReceipt() : new GeneralDonationReceipt();
+        $receipt = $receiptGenerator->generateReceipt($donation);
+    
         header('Content-Type: application/octet-stream');
         header('Content-Disposition: attachment; filename="receipt_' . $donationId . '.html"');
-        echo "<h1>Donation Receipt</h1>";
-        echo "<p>Donation ID: " . htmlspecialchars($donation['donation_id']) . "</p>";
-        echo "<p>Amount: $" . htmlspecialchars($donation['amount']) . "</p>";
-        echo "<p>Date: " . htmlspecialchars($donation['date']) . "</p>";
-        if ($donation['event_name']) {
-            echo "<p>Event: " . htmlspecialchars($donation['event_name']) . "</p>";
-            echo "<p>Event Date: " . htmlspecialchars($donation['event_date']) . "</p>";
-            echo "<p>Event Location: " . htmlspecialchars($donation['event_location']) . "</p>";
-        }
+        echo $receipt;
     }
+    
+    
+    
+    
+    
 
     public function viewInbox() {
         $userId = $_SESSION['user_id']; // Get the logged-in user ID
@@ -168,6 +190,12 @@ class DonorController {
     
         include 'views/inbox.php';
     }
+
+    public function view($params = []) {
+        // Redirect to viewDonations
+        $this->viewDonations();
+    }
+    
     
     
     

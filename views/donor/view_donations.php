@@ -10,6 +10,7 @@
         </tr>
     </thead>
     <tbody>
+    <?php if (!empty($donations)): ?>
         <?php foreach ($donations as $donation): ?>
         <tr>
             <td><?= htmlspecialchars($donation['donation_id']) ?></td>
@@ -21,5 +22,10 @@
             </td>
         </tr>
         <?php endforeach; ?>
+    <?php else: ?>
+        <tr>
+            <td colspan="5" style="text-align: center;">No donations found.</td>
+        </tr>
+    <?php endif; ?>
     </tbody>
 </table>
