@@ -58,7 +58,11 @@ class EventController {
     }          
 
     // Updates an event’s details
-    public function update($eventId, $data) {
+    public function update($params) {
+        $eventId = $params['id'] ?? null;
+        unset($params['id']); // Remove `id` from data
+        $data = $params;
+    
         if (empty($eventId) || !is_array($data)) {
             echo "Invalid event ID or data.";
             return;
@@ -66,13 +70,13 @@ class EventController {
     
         $result = $this->eventModel->updateEvent($eventId, $data);
         if ($result) {
-            // Redirect back to the event list
             header("Location: index.php?controller=event&action=list");
             exit;
         } else {
             echo "Error updating event.";
         }
     }
+    
     
 
     // List all events
