@@ -45,7 +45,7 @@ class Volunteer implements Observer {
         $this->volunteer_id = $result[0]['volunteer_id'];
         $this->name = $result[0]['name'];
         $this->contact_info = $result[0]['contact_info'];
-        $this->availability = $result[0]['availability'];
+        //$this->availability = $result[0]['availability'];
         $this->user_id = $result[0]['user_id'];
     
         return $this;
