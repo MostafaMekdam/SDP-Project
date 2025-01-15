@@ -2,6 +2,8 @@
 require_once 'models/Event.php';
 require_once 'models/Volunteer.php';
 require_once 'models/Donor.php';
+require_once __DIR__ . '/../commands/UnregisterVolunteerCommand.php';
+require_once __DIR__ . '/../commands/CommandInvoker.php';
 
 class EventController {
     private $eventModel;
@@ -165,6 +167,23 @@ class EventController {
         } else {
             echo "Error: Event ID is missing.";
         }
+    }
+
+    public function unregisterVolunteer($params) {
+        if (!isset($params['event_id']) || !isset($params['volunteer_id'])) {
+            echo "Error: Missing event or volunteer ID.";
+            return;
+        }
+    
+        $eventId = (int)$params['event_id'];
+        $volunteerId = (int)$params['volunteer_id'];
+    
+        $command = new UnregisterVolunteerCommand($eventId, $volunteerId);
+        $invoker = new CommandInvoker();
+        $invoker->setCommand($command);
+    
+        // Execute the command
+        $invoker->executeCommand();
     }
     
     
