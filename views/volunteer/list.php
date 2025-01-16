@@ -12,8 +12,6 @@
             <th>Person ID</th>
             <th>Name</th>
             <th>Contact Info</th>
-            <th>Availability</th>
-            <th>Actions</th>
         </tr>
 
         <?php if (!empty($volunteers)) : ?>
@@ -24,11 +22,6 @@
                 <td> <?php echo $array['person_id'] ?? "Person ID not available"; ?></td>
                 <td><?= htmlspecialchars($volunteer['name']) ?></td>
                 <td><?= htmlspecialchars($volunteer['contact_info']) ?></td>
-                <td><?= $volunteer['availability'] ? 'Available' : 'Not Available' ?></td>
-                <td>
-                    <a href="/volunteer/view/<?= $volunteer['volunteer_id'] ?>">View</a>
-                    <a href="/volunteer/edit/<?= $volunteer['volunteer_id'] ?>">Edit</a>
-                </td>
             </tr>
             <?php endforeach; ?>
         <?php else: ?>
