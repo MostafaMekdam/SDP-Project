@@ -4,25 +4,14 @@ require_once 'models/Volunteer.php';
 require_once 'models/Donor.php';
 require_once __DIR__ . '/../commands/UnregisterVolunteerCommand.php';
 require_once __DIR__ . '/../commands/CommandInvoker.php';
+require_once __DIR__ . '/../EventManagementFacade.php';
 
 class EventController {
-    private $eventModel;
-    private $volunteerModel;
-    private $donorModel;
-    private $db;
+    private $eventFacade;
 
     public function __construct() {
-        $this->eventModel = new Event();
-        $this->volunteerModel = new Volunteer();
-        $this->donorModel = new Donor();
-        $this->db = Database::getInstance();
-
-        // Register observers
-        $this->eventModel->registerObserver($this->volunteerModel);
-        $this->eventModel->registerObserver($this->donorModel);
+        $this->eventFacade = new EventManagementFacade();
     }
-
-    // Adds a new event
 
     public function store() {
         $eventData = [
@@ -31,46 +20,38 @@ class EventController {
             'location' => $_POST['location'],
             'capacity' => $_POST['capacity']
         ];
-    
-        $result = $this->eventModel->addEvent($eventData);
+
+        $result = $this->eventFacade->createEvent($eventData);
         if ($result) {
-            // Redirect to the event list page after successful creation
             header("Location: index.php?controller=event&action=list");
             exit;
         } else {
             echo "Error creating event.";
         }
-    }    
+    }
 
-
-    // Retrieves event information
     public function view($params) {
-        if (!isset($params['id']) || empty($params['id'])) {
-            die("An error occurred: Invalid event ID provided.");
+        $eventId = $params['id'] ?? null;
+        if (!$eventId) {
+            echo "Error: Event ID is required.";
+            return;
         }
-    
-        $eventId = (int)$params['id'];
-        $event = $this->eventModel->getEventById($eventId);
-    
-        if ($event === null) {
-            die("An error occurred: Event not found.");
-        }
-    
-        require 'views/event/view.php';
-    }          
 
-    // Updates an event’s details
+        $event = $this->eventFacade->getEventDetails($eventId);
+        include 'views/event/view.php';
+    }
+
     public function update($params) {
         $eventId = $params['id'] ?? null;
         unset($params['id']); // Remove `id` from data
         $data = $params;
-    
-        if (empty($eventId) || !is_array($data)) {
+
+        if (!$eventId || empty($data)) {
             echo "Invalid event ID or data.";
             return;
         }
-    
-        $result = $this->eventModel->updateEvent($eventId, $data);
+
+        $result = $this->eventFacade->updateEvent($eventId, $data);
         if ($result) {
             header("Location: index.php?controller=event&action=list");
             exit;
@@ -78,13 +59,10 @@ class EventController {
             echo "Error updating event.";
         }
     }
-    
-    
 
-    // List all events
     public function list() {
-        $events = $this->eventModel->getEvents();
-        
+        $events = $this->eventFacade->listAllEvents();
+
         if ($_SESSION['role'] === 'Donor') {
             include 'views/event/donor_list.php'; // Separate view for donors
         } elseif ($_SESSION['role'] === 'Volunteer') {
@@ -93,157 +71,73 @@ class EventController {
             include 'views/event/list.php'; // Existing view for admins
         }
     }
-    
 
-    // Display add event form
     public function add() {
-        require 'views/event/add.php';
+        include 'views/event/add.php';
     }
 
-    // Display edit event form
     public function edit($params) {
-        if (!isset($params['id']) || empty($params['id'])) {
-            die("An error occurred: Invalid event ID provided.");
+        $eventId = $params['id'] ?? null;
+        if (!$eventId) {
+            echo "Error: Event ID is required.";
+            return;
         }
-    
-        $eventId = (int)$params['id'];
-        $event = $this->eventModel->getEventById($eventId);
-    
-        if ($event === null) {
-            die("An error occurred: Event not found.");
-        }
-    
-        require 'views/event/edit.php';
-    }    
 
-    public function register() {
-        if (isset($_GET['event_id'])) {
-            $eventId = $_GET['event_id'];
-            $userId = $_SESSION['user_id']; // Logged-in user's ID
-    
-            try {
-                // Step 1: Add user as an observer to the event
-                $observerQuery = "INSERT IGNORE INTO Event_Observers (event_id, user_id) VALUES (:event_id, :user_id)";
-                $this->db->execute($observerQuery, [
-                    ':event_id' => $eventId,
-                    ':user_id' => $userId,
-                ]);
-    
-                // Step 2: Check if the user is already a volunteer
-                $volunteerQuery = "SELECT volunteer_id FROM Volunteer WHERE user_id = :user_id";
-                $volunteer = $this->db->query($volunteerQuery, [':user_id' => $userId]);
-    
-                if (!$volunteer) {
-                    throw new Exception("The logged-in user is not a volunteer.");
-                }
-    
-                $volunteerId = $volunteer[0]['volunteer_id']; // Retrieve the volunteer ID
-    
-                // Step 3: Ensure the attendee exists in the Attendee table
-                $attendeeQuery = "INSERT IGNORE INTO Attendee (attendee_id, ticket_status) VALUES (:attendee_id, 1)";
-                $this->db->execute($attendeeQuery, [
-                    ':attendee_id' => $volunteerId,
-                ]);
-    
-                // Step 4: Link the attendee to the event
-                $eventAttendeeQuery = "INSERT INTO Event_Attendees (event_id, attendee_id) VALUES (:event_id, :attendee_id)";
-                $this->db->execute($eventAttendeeQuery, [
-                    ':event_id' => $eventId,
-                    ':attendee_id' => $volunteerId,
-                ]);
-    
-                // Step 5: Add a notification to the volunteer's inbox
-                $notificationQuery = "INSERT INTO Inbox (user_id, message) VALUES (:user_id, :message)";
-                $message = "You have successfully registered for Event ID: $eventId and will receive updates.";
-                $this->db->execute($notificationQuery, [
-                    ':user_id' => $userId,
-                    ':message' => $message,
-                ]);
-    
-                echo "Successfully registered for the event and added as an observer.";
-            } catch (Exception $e) {
-                echo "Error: " . $e->getMessage();
-            }
-        } else {
-            echo "Error: Event ID is missing.";
-        }
+        $event = $this->eventFacade->getEventDetails($eventId);
+        include 'views/event/edit.php';
     }
 
-    public function unregisterVolunteer($params) {
-        if (!isset($params['event_id']) || !isset($params['volunteer_id'])) {
+    public function register($params) {
+        $eventId = $params['event_id'] ?? null;
+        $volunteerId = $_SESSION['user_id'];
+
+        if (!$eventId || !$volunteerId) {
             echo "Error: Missing event or volunteer ID.";
             return;
         }
-    
-        $eventId = (int)$params['event_id'];
-        $volunteerId = (int)$params['volunteer_id'];
-    
+
+        $result = $this->eventFacade->registerVolunteer($eventId, $volunteerId);
+        echo $result;
+    }
+
+    public function unregister($params) {
+        $eventId = $params['event_id'] ?? null;
+        $volunteerId = $_SESSION['user_id'];
+
+        if (!$eventId || !$volunteerId) {
+            echo "Error: Missing event or volunteer ID.";
+            return;
+        }
+
         $command = new UnregisterVolunteerCommand($eventId, $volunteerId);
         $invoker = new CommandInvoker();
         $invoker->setCommand($command);
-    
+
         // Execute the command
         $invoker->executeCommand();
     }
-    
-    
 
-    public function listAttendees() {
-        if (isset($_GET['event_id'])) {
-            $eventId = $_GET['event_id'];
-    
-            try {
-                // Get the iterator for attendees
-                $iterator = $this->eventModel->getAttendeeIterator($eventId);
-                
-                // Convert iterator to an array for the view
-                $attendees = [];
-                foreach ($iterator as $attendee) {
-                    $attendees[] = $attendee;
-                }
-    
-                // Include the view
-                include 'views/event/attendees.php';
-            } catch (Exception $e) {
-                echo "Error: " . $e->getMessage();
-            }
-        } else {
-            echo "Event ID is missing.";
-        }
-    }
+    public function listAttendees($params) {
+        $eventId = $params['event_id'] ?? null;
 
-
-       // List volunteers for a specific event
-    public function listVolunteers() {
-        if (isset($_GET['event_id'])) {
-            $eventId = (int)$_GET['event_id'];
-
-            try {
-                // Step 1: Validate event existence
-                $event = $this->eventModel->getEventById($eventId);
-                if (!$event) {
-                    throw new Exception("The event does not exist.");
-                }
-
-                // Step 2: Fetch the list of volunteers attending the event
-                $query = "
-                    SELECT Volunteer.name, Volunteer.contact_info 
-                    FROM Event_Attendees
-                    JOIN Volunteer ON Volunteer.volunteer_id = Event_Attendees.attendee_id
-                    WHERE Event_Attendees.event_id = :event_id
-                ";
-                $volunteers = $this->db->query($query, [':event_id' => $eventId]);
-
-                // Include the view
-                include 'views/event/volunteer_attendees.php';
-            } catch (Exception $e) {
-                echo "Error: " . $e->getMessage();
-            }
-        } else {
+        if (!$eventId) {
             echo "Error: Event ID is missing.";
+            return;
         }
+
+        $attendees = $this->eventFacade->listEventAttendees($eventId);
+        include 'views/event/attendees.php';
     }
-    
-    
+
+    public function listVolunteers($params) {
+        $eventId = $params['event_id'] ?? null;
+
+        if (!$eventId) {
+            echo "Error: Event ID is missing.";
+            return;
+        }
+
+        $volunteers = $this->eventFacade->listEventVolunteers($eventId);
+        include 'views/event/volunteer_attendees.php';
+    }
 }
-?>

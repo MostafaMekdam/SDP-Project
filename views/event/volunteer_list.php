@@ -24,10 +24,8 @@
                 <td><?= htmlspecialchars($event['location']) ?></td>
                 <td>
                     <a href="index.php?controller=event&action=register&event_id=<?= $event['event_id'] ?>"
-                        onclick="return confirm('Are you sure you want to register for this event?')">
-                        Register
-                    </a>
-                    <a href="index.php?controller=event&action=unregisterVolunteer&event_id=<?= $event['event_id'] ?>&volunteer_id=<?= $_SESSION['user_id'] ?>"
+                        onclick="return confirm('Are you sure you want to register for this event?')">Register</a>
+                    <a href="index.php?controller=event&action=unregister&event_id=<?= $event['event_id'] ?>"
                         onclick="return confirm('Are you sure you want to unregister from this event?')">Unregister</a>
                 </td>
             </tr>
