@@ -54,4 +54,10 @@ class Donation {
                   ORDER BY total_amount DESC";
         return $this->db->query($query);
     }
+
+    public function getTransactionsByDonationId($donationId) {
+        $query = "SELECT * FROM Transactions WHERE donation_id = :donation_id";
+        return $this->db->query($query, [':donation_id' => $donationId]);
+    }
+    
 }
