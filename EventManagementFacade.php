@@ -121,8 +121,27 @@ class EventManagementFacade {
     }
 
     // Get event details
-    public function getEventDetails($eventId) {
+    /*public function getEventDetails($eventId) {
         return $this->eventModel->getEventById($eventId);
+    }*/
+    public function generateReport($eventId) {
+        $queryVolunteers = "SELECT COUNT(*) AS total_volunteers FROM Event_Attendees WHERE event_id = :event_id";
+        $queryDonations = "SELECT SUM(amount) AS total_donations FROM Donation WHERE event_id = :event_id";
+
+        $volunteers = $this->db->query($queryVolunteers, [':event_id' => $eventId]);
+        $donations = $this->db->query($queryDonations, [':event_id' => $eventId]);
+
+        return [
+            'total_volunteers' => $volunteers[0]['total_volunteers'] ?? 0,
+            'total_donations' => $donations[0]['total_donations'] ?? 0.00
+        ];
+    }
+
+    public function getEventDetails($eventId) {
+        $query = "SELECT * FROM Event WHERE event_id = :event_id";
+        $result = $this->db->query($query, [':event_id' => $eventId]);
+
+        return $result[0] ?? null;
     }
 
     // List all events

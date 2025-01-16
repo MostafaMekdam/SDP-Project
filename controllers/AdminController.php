@@ -1,14 +1,17 @@
 <?php
 require_once 'models/Donation.php';
 require_once 'models/Donor.php';
+require_once 'EventManagementFacade.php';
 
 class AdminController {
     private $donationModel;
     private $donorModel;
+    private $eventFacade;
 
     public function __construct() {
         $this->donationModel = new Donation();
         $this->donorModel = new Donor();
+        $this->eventFacade = new EventManagementFacade(); // Initialize the EventManagementFacade
     }
 
     // List all donations
@@ -55,6 +58,20 @@ class AdminController {
         }
     
         require 'views/admin/donation_report.php';
+    }
+    public function viewReport($params) {
+        $eventId = $params['event_id'] ?? null;
+
+        if (!$eventId) {
+            echo "Error: Event ID is required.";
+            return;
+        }
+
+        // Generate the report using the facade
+        $report = $this->eventFacade->generateReport($eventId);
+        $event = $this->eventFacade->getEventDetails($eventId);
+
+        include 'C:\xampp\htdocs\projects\MVC\SDP-Project\views\event\view_report.php'; // Load the report view
     }
     
 }

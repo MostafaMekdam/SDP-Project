@@ -16,6 +16,7 @@
     <?php endif; ?>
     <a href="index.php?controller=event&action=list">Back to Events List</a>
     <a href="index.php?controller=event&action=listVolunteers&event_id=<?= htmlspecialchars($event['event_id']) ?>">View Volunteer Attendees</a>
+    <a href="index.php?controller=admin&action=viewReport&event_id=<?= htmlspecialchars($event['event_id']) ?>">View Report</a>
 
 </body>
 </html>
