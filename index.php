@@ -9,7 +9,7 @@ session_start();
 
 // Autoload required classes
 spl_autoload_register(function ($class) {
-    $paths = ["controllers", "."];
+    $paths = ["controllers", "models", "."]; // Add "models" to the paths array
     foreach ($paths as $path) {
         $file = __DIR__ . "/{$path}/{$class}.php";
         if (file_exists($file)) {
@@ -65,8 +65,6 @@ function displayUserControlPanel()
             echo "<li><a href='?controller=event&action=list'>Manage Events</a></li>";
             echo "<li><a href='?controller=volunteer&action=listVolunteers'>Manage Volunteers</a></li>";
             echo "<li><a href='?controller=admin&action=listDonations'>Manage Donations</a></li>";
-            echo "<li><a href='?controller=admin&action=generateReport'>Generate Donation Report</a></li>";
-            echo "<li><a href='?controller=payment&action=listTransactions'>Manage Transactions</a></li>";
             break;
         case 'Donor':
             echo "<li><a href='?controller=donor&action=viewDonations'>My Donations</a></li>";
@@ -95,7 +93,16 @@ try {
     error_log("Received Parameters: " . print_r($params, true));
 
     if ($controller && $action) {
-        $router->route($controller, $action, $params);
+        // Handle sorting logic for donations
+        if ($controller === 'admin' && $action === 'listDonations' && isset($params['column']) && isset($params['order'])) {
+            $column = $params['column'];
+            $order = $params['order'];
+            $donationModel = new Donation();
+            $donations = $donationModel->getSortedDonations($column, $order);
+            include 'views/admin/donations.php';
+        } else {
+            $router->route($controller, $action, $params);
+        }
     } elseif (isLoggedIn()) {
         displayUserControlPanel();
     } else {
