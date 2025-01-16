@@ -20,16 +20,19 @@ spl_autoload_register(function ($class) {
 });
 
 // Utility functions
-function isLoggedIn() {
+function isLoggedIn()
+{
     return isset($_SESSION['user_id']) && isset($_SESSION['role']);
 }
 
-function redirectToLogin() {
+function redirectToLogin()
+{
     header("Location: index.php?controller=auth&action=login");
     exit;
 }
 
-function checkAccess($requiredRole) {
+function checkAccess($requiredRole)
+{
     if (!isLoggedIn() || $_SESSION['role'] !== $requiredRole) {
         redirectToLogin();
     }
@@ -50,7 +53,8 @@ $routes = [
 $router = new Router($routes);
 
 // Display User Control Panel based on role
-function displayUserControlPanel() {
+function displayUserControlPanel()
+{
     echo "<h1>Non-Profit Management System</h1><ul>";
     switch ($_SESSION['role'] ?? '') {
         case 'Admin':
@@ -59,6 +63,8 @@ function displayUserControlPanel() {
             echo "<li><a href='?controller=donor&action=listDonors'>Manage Donors</a></li>";
             echo "<li><a href='?controller=event&action=list'>Manage Events</a></li>";
             echo "<li><a href='?controller=volunteer&action=listVolunteers'>Manage Volunteers</a></li>";
+            echo "<li><a href='?controller=admin&action=listDonations'>Manage Donations</a></li>";
+            echo "<li><a href='?controller=admin&action=generateReport'>Generate Donation Report</a></li>";
             break;
         case 'Donor':
             echo "<li><a href='?controller=donor&action=viewDonations'>My Donations</a></li>";

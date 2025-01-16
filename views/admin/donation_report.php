@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Manage Donations</title>
+    <title>Donation Report</title>
 </head>
 <body>
-    <h1>All Donations</h1>
+    <h1>Donation Report</h1>
+
     <table border="1" cellpadding="5" cellspacing="0">
         <thead>
             <tr>
@@ -27,5 +28,9 @@
             <?php endforeach; ?>
         </tbody>
     </table>
+
+    <h3>Total Donations: $<?= number_format($totalAmount, 2) ?></h3>
+
+    <a href="index.php?controller=admin&action=listDonations">Back to Donations</a>
 </body>
 </html>
