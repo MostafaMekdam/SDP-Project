@@ -9,7 +9,6 @@
     <table>
         <tr>
             <th>ID</th>
-            <th>Person ID</th>
             <th>Name</th>
             <th>Contact Info</th>
         </tr>
@@ -19,7 +18,6 @@
            
             <tr>
                 <td><?= htmlspecialchars($volunteer['volunteer_id']) ?></td>
-                <td> <?php echo $array['person_id'] ?? "Person ID not available"; ?></td>
                 <td><?= htmlspecialchars($volunteer['name']) ?></td>
                 <td><?= htmlspecialchars($volunteer['contact_info']) ?></td>
             </tr>
