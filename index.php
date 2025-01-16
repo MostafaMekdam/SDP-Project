@@ -47,6 +47,7 @@ $routes = [
     'volunteer' => VolunteerController::class,
     'auth' => AuthController::class,
     'admin' => AdminController::class,
+    'payment' => PaymentController::class,
 ];
 
 // Instantiate Router with route definitions
@@ -65,6 +66,7 @@ function displayUserControlPanel()
             echo "<li><a href='?controller=volunteer&action=listVolunteers'>Manage Volunteers</a></li>";
             echo "<li><a href='?controller=admin&action=listDonations'>Manage Donations</a></li>";
             echo "<li><a href='?controller=admin&action=generateReport'>Generate Donation Report</a></li>";
+            echo "<li><a href='?controller=payment&action=listTransactions'>Manage Transactions</a></li>";
             break;
         case 'Donor':
             echo "<li><a href='?controller=donor&action=viewDonations'>My Donations</a></li>";
