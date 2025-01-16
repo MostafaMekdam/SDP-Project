@@ -141,3 +141,4 @@ class EventController {
         include 'views/event/volunteer_attendees.php';
     }
 }
+
