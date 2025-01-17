@@ -76,7 +76,7 @@ class AdminController {
         $report = $this->eventFacade->generateReport($eventId);
         $event = $this->eventFacade->getEventDetails($eventId);
 
-        include 'C:\xampp\htdocs\SDP-Project\views\event\view_report.php'; // Load the report view
+        include 'C:\xampp\htdocs\projects\MVC\SDP-Project\views\event\view_report.php'; // Load the report view
     }
 
     // Generate donations report for download
