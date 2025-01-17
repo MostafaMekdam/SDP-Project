@@ -9,9 +9,6 @@
     <label>Contact Info:</label>
     <input type="text" name="contact_info" required>
     <br>
-    <label>Availability:</label>
-    <input type="checkbox" name="availability" value="1">
-    <br>
     <button type="submit">Add Volunteer</button>
 </form>
 

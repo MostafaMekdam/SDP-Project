@@ -63,13 +63,38 @@ class VolunteerController {
     
         include 'views/inbox.php';
     }
+
+    public function listVolunteers() {
+        // Query to get volunteers with their assigned tasks
+        $query = "
+            SELECT 
+                v.volunteer_id, 
+                v.name, 
+                v.contact_info, 
+                GROUP_CONCAT(t.description SEPARATOR ', ') AS assigned_tasks
+            FROM Volunteer v
+            LEFT JOIN VolunteerTask_Volunteers vt ON v.volunteer_id = vt.volunteer_id
+            LEFT JOIN VolunteerTask t ON vt.task_id = t.task_id
+            GROUP BY v.volunteer_id
+        ";
+    
+        $volunteers = $this->db->query($query); // Execute the query
+    
+        // Load the volunteer list view
+        require 'views/volunteer/list.php';
+    }
+    
     
 
     // List all volunteers
-    public function listVolunteers() {
-        $volunteers = $this->volunteerModel->getVolunteers();
-        require 'views/volunteer/list.php';
-    }
+    //public function listVolunteers() {
+        //$volunteers = $this->volunteerModel->getVolunteers();
+        //require 'views/volunteer/list.php';
+    //}
+
+    
+
+
 
 
         // Displays logged-in volunteer's skills
@@ -160,6 +185,61 @@ class VolunteerController {
                 exit;
             }
         }
+
+        public function assignTasks($params) {
+            $eventId = $params['event_id'] ?? null;
+        
+            if (!$eventId) {
+                echo "Error: Event ID is required.";
+                return;
+            }
+        
+            // Fetch volunteers for the event
+            $query = "
+                SELECT v.volunteer_id, v.name, v.contact_info
+                FROM Volunteer v
+                JOIN Event_Attendees ea ON v.volunteer_id = ea.attendee_id
+                WHERE ea.event_id = :event_id
+            ";
+            $volunteers = $this->db->query($query, [':event_id' => $eventId]);
+        
+            // Fetch all tasks
+            $tasksQuery = "SELECT * FROM VolunteerTask";
+            $tasks = $this->db->query($tasksQuery);
+        
+            // Include the view for assigning tasks
+            include 'views/volunteer/assign_tasks.php';
+        }
+
+
+        public function saveAssignedTasks($params) {
+            $eventId = $params['event_id'] ?? null;
+            $volunteers = $params['volunteers'] ?? [];
+            $tasks = $params['tasks'] ?? [];
+        
+            if (!$eventId || empty($volunteers) || empty($tasks)) {
+                echo "Error: Missing data.";
+                return;
+            }
+        
+            // Save assignments to the database
+            foreach ($volunteers as $volunteerId) {
+                if (!empty($tasks[$volunteerId])) {
+                    $query = "INSERT INTO VolunteerTask_Volunteers (task_id, volunteer_id) 
+                              VALUES (:task_id, :volunteer_id)";
+                    $this->db->execute($query, [
+                        ':task_id' => $tasks[$volunteerId],
+                        ':volunteer_id' => $volunteerId
+                    ]);
+                }
+            }
+        
+            echo "Tasks assigned successfully.";
+            header("Location: index.php?controller=volunteer&action=listVolunteers");
+            exit;
+        }
+        
+        
 
     
     

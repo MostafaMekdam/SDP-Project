@@ -37,38 +37,50 @@ class EventManagementFacade {
     // Register a volunteer to an event
     public function registerVolunteer($eventId, $volunteerId) {
         try {
-            // Check if the volunteer exists in the Attendee table
-            $attendeeCheckQuery = "SELECT attendee_id FROM Attendee WHERE attendee_id = :volunteer_id";
-            $attendeeCheckResult = $this->db->query($attendeeCheckQuery, [':volunteer_id' => $volunteerId]);
-    
-            // Insert into Attendee table if not already present
-            if (empty($attendeeCheckResult)) {
-                $this->db->execute(
-                    "INSERT INTO Attendee (attendee_id, ticket_status) VALUES (:volunteer_id, 1)",
-                    [':volunteer_id' => $volunteerId]
-                );
+            $eventData = $this->eventModel->getEventById($eventId);
+            if (!$eventData) {
+                return "Error: Event not found.";
             }
     
-            // Add volunteer to Event_Attendees
-            $this->db->execute(
-                "INSERT INTO Event_Attendees (event_id, attendee_id) VALUES (:event_id, :volunteer_id)",
-                [':event_id' => $eventId, ':volunteer_id' => $volunteerId]
-            );
+            $eventObj = new Event($eventData); // Event object with state management
+            $stateMessage = $eventObj->registerVolunteer($volunteerId);
     
-            // Add volunteer as an observer
-            $this->db->execute(
-                "INSERT INTO Event_Observers (event_id, user_id) VALUES (:event_id, :volunteer_id)",
-                [':event_id' => $eventId, ':volunteer_id' => $volunteerId]
-            );
+            if (strpos($stateMessage, 'has been registered') !== false) {
+                // Check if the volunteer exists in the Attendee table
+                $attendeeCheckQuery = "SELECT attendee_id FROM Attendee WHERE attendee_id = :volunteer_id";
+                $attendeeCheckResult = $this->db->query($attendeeCheckQuery, [':volunteer_id' => $volunteerId]);
     
-            // Send notification
-            $this->sendNotification($volunteerId, "You are registered for Event ID: $eventId");
+                // Insert if not already present
+                if (empty($attendeeCheckResult)) {
+                    $this->db->execute(
+                        "INSERT INTO Attendee (attendee_id, ticket_status) VALUES (:volunteer_id, 1)",
+                        [':volunteer_id' => $volunteerId]
+                    );
+                }
     
-            return "Volunteer registered successfully.";
+                // Add the volunteer to the event
+                $this->db->execute(
+                    "INSERT INTO Event_Attendees (event_id, attendee_id) VALUES (:event_id, :volunteer_id)",
+                    [':event_id' => $eventId, ':volunteer_id' => $volunteerId]
+                );
+    
+                // Add volunteer as an observer
+                $this->db->execute(
+                    "INSERT INTO Event_Observers (event_id, user_id) VALUES (:event_id, :volunteer_id)",
+                    [':event_id' => $eventId, ':volunteer_id' => $volunteerId]
+                );
+    
+                // Send notification
+                $this->sendNotification($volunteerId, "You are registered for Event ID: $eventId");
+                return $stateMessage;
+            } else {
+                return $stateMessage;
+            }
         } catch (Exception $e) {
             return "Error: " . $e->getMessage();
         }
-    }    
+    }
+     
 
     // Unregister a volunteer from an event
     public function unregisterVolunteer($eventId, $volunteerId) {
@@ -109,8 +121,12 @@ class EventManagementFacade {
 
     // List event volunteers
     public function listEventVolunteers($eventId) {
-        return $this->listEventAttendees($eventId); // Reuse the same logic
-    }
+        $query = "SELECT v.volunteer_id, v.name, v.contact_info 
+                  FROM Volunteer v
+                  JOIN Event_Attendees ea ON ea.attendee_id = v.volunteer_id
+                  WHERE ea.event_id = :event_id";
+        return $this->db->query($query, [':event_id' => $eventId]);
+    }    
 
     // Send notification to a user
     private function sendNotification($userId, $message) {

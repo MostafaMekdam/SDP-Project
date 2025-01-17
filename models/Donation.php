@@ -16,6 +16,25 @@ class Donation {
         return $this->db->query($query);
     }    
 
+    // Fetch sorted donations
+    public function getSortedDonations($column = 'date', $order = 'DESC') {
+        $allowedColumns = ['donation_id', 'type', 'donor_id', 'amount', 'date'];
+        $allowedOrder = ['ASC', 'DESC'];
+
+        // Validate input to prevent SQL injection
+        if (!in_array($column, $allowedColumns)) {
+            $column = 'date';
+        }
+        if (!in_array($order, $allowedOrder)) {
+            $order = 'DESC';
+        }
+
+        $query = "SELECT donation_id, type, donor_id, amount, date 
+                  FROM Donation 
+                  ORDER BY $column $order";
+        return $this->db->query($query);
+    }
+
     // Fetch transactions for a specific donor
     public function getDonorTransactions($donorId) {
         $query = "SELECT d.donation_id, d.type, r.amount, r.date_issued 
