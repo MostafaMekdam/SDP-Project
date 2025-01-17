@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-    
+
 <head>
     <title>Donations</title>
 </head>
@@ -56,6 +56,14 @@
 
     <!-- Link to Download Report -->
     <a href="index.php?controller=admin&action=generateReport" class="button">Download Donations Report</a>
+
+    <!-- Donation Details -->
+    <h1>Donation Details</h1>
+    <p>Donation ID: <?= $donationAdapter->getDonationId() ?></p>
+    <p>Type: <?= $donationAdapter->getDonationType() ?></p>
+    <p>Amount: $<?= $donationAdapter->getDonationAmount() ?></p>
+    <p>Date: <?= $donationAdapter->getDonationDate() ?></p>
+
 </body>
 
 </html>

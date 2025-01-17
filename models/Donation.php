@@ -7,6 +7,16 @@ class Donation {
     public function __construct() {
         $this->db = Database::getInstance();
     }
+    
+    public function getData() {
+        // Example method to fetch a donation's data
+        return [
+            'id' => 1,            // Example ID
+            'type' => 'money',    // Example type
+            'amount' => 500.00,   // Example amount
+            'date' => '2025-01-16' // Example date
+        ];
+    }
 
     // Fetch all donations
     public function getAllDonations() {
@@ -74,9 +84,9 @@ class Donation {
         return $this->db->query($query);
     }
 
+    // Fetch transactions for a specific donation ID
     public function getTransactionsByDonationId($donationId) {
         $query = "SELECT * FROM Transactions WHERE donation_id = :donation_id";
         return $this->db->query($query, [':donation_id' => $donationId]);
     }
-    
 }

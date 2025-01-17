@@ -132,10 +132,7 @@ class EventManagementFacade {
         );
     }
 
-    // Get event details
-    /*public function getEventDetails($eventId) {
-        return $this->eventModel->getEventById($eventId);
-    }*/
+    // Generate event-specific report
     public function generateReport($eventId) {
         $queryVolunteers = "SELECT COUNT(*) AS total_volunteers FROM Event_Attendees WHERE event_id = :event_id";
         $queryDonations = "SELECT SUM(amount) AS total_donations FROM Donation WHERE event_id = :event_id";
