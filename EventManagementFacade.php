@@ -121,8 +121,12 @@ class EventManagementFacade {
 
     // List event volunteers
     public function listEventVolunteers($eventId) {
-        return $this->listEventAttendees($eventId); // Reuse the same logic
-    }
+        $query = "SELECT v.volunteer_id, v.name, v.contact_info 
+                  FROM Volunteer v
+                  JOIN Event_Attendees ea ON ea.attendee_id = v.volunteer_id
+                  WHERE ea.event_id = :event_id";
+        return $this->db->query($query, [':event_id' => $eventId]);
+    }    
 
     // Send notification to a user
     private function sendNotification($userId, $message) {

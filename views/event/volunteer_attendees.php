@@ -5,7 +5,7 @@
 </head>
 <body>
     <h1>Volunteer Attendees for Event</h1>
-    
+
     <table>
         <thead>
             <tr>
@@ -17,6 +17,7 @@
             <?php if (!empty($volunteers)): ?>
                 <?php foreach ($volunteers as $volunteer): ?>
                     <tr>
+                        <td><?= htmlspecialchars($volunteer['volunteer_id']) ?></td>
                         <td><?= htmlspecialchars($volunteer['name']) ?></td>
                         <td><?= htmlspecialchars($volunteer['contact_info']) ?></td>
                     </tr>
