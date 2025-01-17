@@ -2,16 +2,21 @@
 require_once 'models/Donation.php';
 require_once 'models/Donor.php';
 require_once 'EventManagementFacade.php';
+require_once __DIR__ . '/../adapterpattern/EmailAdapter.php';
+require_once __DIR__ . '/../adapterpattern/LegacyEmailer.php';
+
 
 class AdminController {
     private $donationModel;
     private $donorModel;
     private $eventFacade;
+    private $emailAdapter;
 
     public function __construct() {
         $this->donationModel = new Donation();
         $this->donorModel = new Donor();
         $this->eventFacade = new EventManagementFacade(); // Initialize the EventManagementFacade
+        $this->emailAdapter = new EmailAdapter(new LegacyEmailer());
     }
 
     // List all donations with integrated report and sorting
@@ -108,4 +113,41 @@ class AdminController {
             echo "An error occurred while generating the report.";
         }
     }
+
+    public function sendEmailToDonor($params) {
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            require 'views/donor/send_email.php';
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $donor = Database::getInstance()->query(
+                "SELECT * FROM Donor WHERE donor_id = :donor_id",
+                [':donor_id' => $params['id']]
+            )[0];
+            $this->emailAdapter->sendMessage(
+                $donor['user_id'],      // The internal user ID
+                $donor['contact_info'],
+                $params['subject'],
+                $params['body']
+            );
+            echo "Email sent successfully to donor.";
+        }
+    }
+
+    public function sendEmailToVolunteer($params) {
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            require 'views/volunteer/send_email.php';
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $volunteer = Database::getInstance()->query(
+                "SELECT * FROM Volunteer WHERE volunteer_id = :volunteer_id",
+                [':volunteer_id' => $params['id']]
+            )[0];
+            $this->emailAdapter->sendMessage(
+                $volunteer['user_id'],      // The internal user ID
+                $volunteer['contact_info'],
+                $params['subject'],
+                $params['body']
+            );
+            echo "Email sent successfully to volunteer.";
+        }
+    }
 }
+
