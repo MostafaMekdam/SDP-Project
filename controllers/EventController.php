@@ -3,6 +3,7 @@ require_once 'models/Event.php';
 require_once 'models/Volunteer.php';
 require_once 'models/Donor.php';
 require_once __DIR__ . '/../commands/UnregisterVolunteerCommand.php';
+require_once __DIR__ . '/../commands/RegisterVolunteerCommand.php';
 require_once __DIR__ . '/../commands/CommandInvoker.php';
 require_once __DIR__ . '/../EventManagementFacade.php';
 
@@ -90,15 +91,20 @@ class EventController {
     public function register($params) {
         $eventId = $params['event_id'] ?? null;
         $volunteerId = $_SESSION['user_id'];
-
+    
         if (!$eventId || !$volunteerId) {
             echo "Error: Missing event or volunteer ID.";
             return;
         }
-
-        $result = $this->eventFacade->registerVolunteer($eventId, $volunteerId);
-        echo $result;
+    
+        $command = new RegisterVolunteerCommand($eventId, $volunteerId);
+        $invoker = new CommandInvoker();
+        $invoker->setCommand($command);
+    
+        // Execute the command
+        $invoker->executeCommand();
     }
+    
 
     public function unregister($params) {
         $eventId = $params['event_id'] ?? null;
