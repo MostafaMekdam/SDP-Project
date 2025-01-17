@@ -106,14 +106,15 @@ class DonorController {
                 }
         
                 // Insert the donation record
-                $query = "INSERT INTO Donation (donor_id, event_id, type, amount, date) 
-                          VALUES (:donor_id, :event_id, :type, :amount, :date)";
+                $query = "INSERT INTO Donation (donor_id, event_id, type, amount, date, method) 
+                          VALUES (:donor_id, :event_id, :type, :amount, :date, :method)";
                 $params = [
                     ':donor_id' => (int)$donorId,
                     ':event_id' => $eventId ? (int)$eventId : null,
                     ':type' => (string)$type,
                     ':amount' => $amount ? (float)$amount : null,
                     ':date' => (string)$date,
+                    ':method'    => $_POST['payment_method'], // e.g. "ewallet" or "bankcard"
                 ];
         
                 $result = $this->db->execute($query, $params);

@@ -27,7 +27,7 @@ class PaymentController {
                 d.date,
                 d.event_id,
                 CASE 
-                    WHEN method = 'CreditCard' THEN 'Credit Card'
+                    WHEN method = 'bankcard' THEN 'Credit Card'
                     WHEN method = 'EWallet' THEN 'E-Wallet'
                     ELSE 'Unknown'
                 END AS payment_method
