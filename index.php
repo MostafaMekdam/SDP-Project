@@ -54,34 +54,80 @@ $routes = [
 $router = new Router($routes);
 
 // Display User Control Panel based on role
+// index.php (partial)
 function displayUserControlPanel()
 {
-    echo "<h1>Non-Profit Management System</h1><ul>";
+    // Initialize an empty links array
+    $links = [];
+
+    // Determine the links based on the user role
     switch ($_SESSION['role'] ?? '') {
         case 'Admin':
-            echo "<li><a href='?controller=beneficiary&action=listBeneficiaries'>Manage Beneficiaries</a></li>";
-            echo "<li><a href='?controller=communication&action=listCommunications'>Manage Communications</a></li>";
-            echo "<li><a href='?controller=donor&action=listDonors'>Manage Donors</a></li>";
-            echo "<li><a href='?controller=event&action=list'>Manage Events</a></li>";
-            echo "<li><a href='?controller=volunteer&action=listVolunteers'>Manage Volunteers</a></li>";
-            echo "<li><a href='?controller=admin&action=listDonations'>Manage Donations</a></li>";
+            $links[] = [
+                'url' => '?controller=beneficiary&action=listBeneficiaries',
+                'label' => 'Manage Beneficiaries'
+            ];
+            $links[] = [
+                'url' => '?controller=donor&action=listDonors',
+                'label' => 'Manage Donors'
+            ];
+            $links[] = [
+                'url' => '?controller=event&action=list',
+                'label' => 'Manage Events'
+            ];
+            $links[] = [
+                'url' => '?controller=volunteer&action=listVolunteers',
+                'label' => 'Manage Volunteers'
+            ];
+            $links[] = [
+                'url' => '?controller=admin&action=listDonations',
+                'label' => 'Manage Donations'
+            ];
+            $links[] = [
+                'url' => '?controller=payment&action=listTransactions',
+                'label' => 'Manage Transactions'
+            ];
             break;
         case 'Donor':
-            echo "<li><a href='?controller=donor&action=viewDonations'>My Donations</a></li>";
-            echo "<li><a href='?controller=event&action=list'>View Events</a></li>";
-            echo "<li><a href='?controller=donor&action=viewInbox'>My Inbox</a></li>";
+            $links[] = [
+                'url' => '?controller=donor&action=viewDonations',
+                'label' => 'My Donations'
+            ];
+            $links[] = [
+                'url' => '?controller=event&action=list',
+                'label' => 'View Events'
+            ];
+            $links[] = [
+                'url' => '?controller=donor&action=viewInbox',
+                'label' => 'My Inbox'
+            ];
             break;
         case 'Volunteer':
-            echo "<li><a href='?controller=event&action=list'>View Events</a></li>";
-            echo "<li><a href='?controller=volunteer&action=viewInbox'>My Inbox</a></li>";
-            echo "<li><a href='?controller=volunteer&action=viewSkills'>My Skills</a></li>";
-            echo "<li><a href='?controller=volunteer&action=chooseSkills'>Add Skills</a></li>";
+            $links[] = [
+                'url' => '?controller=event&action=list',
+                'label' => 'View Events'
+            ];
+            $links[] = [
+                'url' => '?controller=volunteer&action=viewInbox',
+                'label' => 'My Inbox'
+            ];
+            $links[] = [
+                'url' => '?controller=volunteer&action=viewSkills',
+                'label' => 'My Skills'
+            ];
+            $links[] = [
+                'url' => '?controller=volunteer&action=chooseSkills',
+                'label' => 'Add Skills'
+            ];
             break;
         default:
             redirectToLogin();
     }
-    echo "</ul><a href='?controller=auth&action=logout'>Logout</a>";
+
+    // Include the dashboard view. The $links array will be available in the view.
+    include 'views/dashboard.php';
 }
+
 
 // Main Logic
 $controller = $_GET['controller'] ?? null;
