@@ -73,14 +73,51 @@
             margin-top: 20px;
             text-decoration: none;
             color: #555;
+            background-color: #5c6e82;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.3s;
         }
 
         a:hover {
-            color: #333;
+            background-color: #3f4c6b;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            color: black;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            a {
+                font-size: 14px;
+                padding: 6px 15px;
+            }
+
+            th, td {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
 <body>
+
     <div class="container">
         <h1>My Inbox</h1>
         <table>
@@ -99,7 +136,12 @@
             </tr>
             <?php endforeach; ?>
         </table>
-        <a href="#">Back to Dashboard</a>
+        <a href="index.php">Back to Dashboard</a>
     </div>
+
+    <div class="footer">
+        <p>&copy; 2025 Your Organization</p>
+    </div>
+
 </body>
 </html>
