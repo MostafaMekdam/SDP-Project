@@ -2,6 +2,7 @@
 require_once 'models/Donation.php';
 require_once 'models/Donor.php';
 require_once 'EventManagementFacade.php';
+require_once 'ReceiptTemplate.php';
 require_once __DIR__ . '/../adapterpattern/EmailAdapter.php';
 require_once __DIR__ . '/../adapterpattern/LegacyEmailer.php';
 
@@ -84,30 +85,18 @@ class AdminController {
    public function generateReport() {
     try {
         $donations = $this->donationModel->getAllDonations(); // Fetch all donation data
-        $totalAmount = 0;
 
-        // Calculate the total donation amount
-        foreach ($donations as $donation) {
-            $totalAmount += $donation['amount'];
-        }
+        // Generate the report using the template pattern
+        $reportGenerator = new DonationsReport();
+        $reportContent = $reportGenerator->generateReport($donations);
 
-        // Generate CSV content
+        // Set headers for CSV download
         $filename = "donations_report_" . date('Y-m-d') . ".csv";
         header("Content-Type: text/csv");
         header("Content-Disposition: attachment; filename=$filename");
 
-        $output = fopen("php://output", "w");
-        fputcsv($output, ['Donation ID', 'Type', 'Donor ID', 'Amount', 'Date']);
-
-        foreach ($donations as $donation) {
-            fputcsv($output, $donation);
-        }
-
-        // Add total amount at the end of the CSV
-        fputcsv($output, []);
-        fputcsv($output, ['Total Donations', '', '', $totalAmount]);
-
-        fclose($output);
+        // Output the generated report
+        echo $reportContent;
         exit;
     } catch (Exception $e) {
         error_log("Error generating donation report: " . $e->getMessage());
