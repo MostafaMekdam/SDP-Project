@@ -1,44 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Manage Transactions</title>
+    <title>Transactions</title>
 </head>
 <body>
     <h1>Manage Transactions</h1>
-    <table border="1">
+    <table>
         <thead>
             <tr>
+                <th>Transaction ID</th>
                 <th>Donation ID</th>
-                <th>Donor ID</th>
-                <th>Type</th>
-                <th>Payment Method</th>
                 <th>Amount</th>
                 <th>Date</th>
-                <th>Event ID</th>
+                <th>Refunded</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            <?php if (!empty($donations)): ?>
-                <?php foreach ($donations as $donation): ?>
-                <tr>
-                    <td><?= htmlspecialchars($donation['donation_id']) ?></td>
-                    <td><?= htmlspecialchars($donation['donor_id']) ?></td>
-                    <td><?= htmlspecialchars($donation['type']) ?></td>
-                    <td><?= htmlspecialchars($donation['payment_method'] ?? 'N/A') ?></td>
-                    <td><?= htmlspecialchars($donation['amount']) ?></td>
-                    <td><?= htmlspecialchars($donation['date']) ?></td>
-                    <td><?= htmlspecialchars($donation['event_id'] ?? 'N/A') ?></td>
-                    <td>
-                        <a href="index.php?controller=payment&action=processRefund&donation_id=<?= $donation['donation_id'] ?>">Refund</a>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <tr>
-                    <td colspan="8">No donations found.</td>
-                </tr>
-            <?php endif; ?>
+            <?php foreach ($transactions as $transaction): ?>
+            <tr>
+                <td><?= htmlspecialchars($transaction['transaction_id']) ?></td>
+                <td><?= htmlspecialchars($transaction['donation_id']) ?></td>
+                <td><?= htmlspecialchars($transaction['amount']) ?></td>
+                <td><?= htmlspecialchars($transaction['date']) ?></td>
+                <td><?= $transaction['refunded'] ? 'Yes' : 'No' ?></td>
+                <td>
+                    <?php if (!$transaction['refunded']): ?>
+                        <a href="index.php?controller=payment&action=processRefund&transaction_id=<?= $transaction['transaction_id'] ?>">Process Refund</a>
+                    <?php else: ?>
+                        Refunded
+                    <?php endif; ?>
+                </td>
+            </tr>
+            <?php endforeach; ?>
         </tbody>
     </table>
 </body>
