@@ -40,3 +40,43 @@ class EventDonationReceipt extends ReceiptTemplate {
         return $body;
     }
 }
+
+
+
+
+
+
+
+abstract class ReportTemplate {
+    public function generateReport($donations) {
+        $report = $this->generateHeader();
+        $report .= $this->generateBody($donations);
+        $report .= $this->generateFooter();
+        return $report;
+    }
+
+    protected function generateHeader() {
+        return "Donation ID,Type,Donor ID,Amount,Date\n";
+    }
+
+    protected abstract function generateBody($donations);
+
+    protected function generateFooter() {
+        return "\nReport generated successfully.";
+    }
+}
+
+class DonationsReport extends ReportTemplate {
+    protected function generateBody($donations) {
+        $body = "";
+        foreach ($donations as $donation) {
+            $body .= htmlspecialchars($donation['donation_id']) . "," .
+                     htmlspecialchars($donation['type']) . "," .
+                     htmlspecialchars($donation['donor_id']) . "," .
+                     htmlspecialchars($donation['amount']) . "," .
+                     htmlspecialchars($donation['date']) . "\n";
+        }
+        return $body;
+    }
+}
+
