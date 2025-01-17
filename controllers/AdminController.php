@@ -76,43 +76,44 @@ class AdminController {
         $report = $this->eventFacade->generateReport($eventId);
         $event = $this->eventFacade->getEventDetails($eventId);
 
-        include _DIR_ . '/../views/event/view_report.php';
+        include __DIR__ . '/../views/event/view_report.php';
     }
 
     // Generate donations report for download
-    public function generateReport() {
-        try {
-            $donations = $this->donationModel->getAllDonations(); // Fetch all donation data
-            $totalAmount = 0;
+   // Generate donations report for download
+   public function generateReport() {
+    try {
+        $donations = $this->donationModel->getAllDonations(); // Fetch all donation data
+        $totalAmount = 0;
 
-            // Calculate the total donation amount
-            foreach ($donations as $donation) {
-                $totalAmount += $donation['amount'];
-            }
-
-            // Generate CSV content
-            $filename = "donations_report_" . date('Y-m-d') . ".csv";
-            header("Content-Type: text/csv");
-            header("Content-Disposition: attachment; filename=$filename");
-
-            $output = fopen("php://output", "w");
-            fputcsv($output, ['Donation ID', 'Type', 'Donor ID', 'Amount', 'Date']);
-
-            foreach ($donations as $donation) {
-                fputcsv($output, $donation);
-            }
-
-            // Add total amount at the end of the CSV
-            fputcsv($output, []);
-            fputcsv($output, ['Total Donations', '', '', $totalAmount]);
-
-            fclose($output);
-            exit;
-        } catch (Exception $e) {
-            error_log("Error generating donation report: " . $e->getMessage());
-            echo "An error occurred while generating the report.";
+        // Calculate the total donation amount
+        foreach ($donations as $donation) {
+            $totalAmount += $donation['amount'];
         }
+
+        // Generate CSV content
+        $filename = "donations_report_" . date('Y-m-d') . ".csv";
+        header("Content-Type: text/csv");
+        header("Content-Disposition: attachment; filename=$filename");
+
+        $output = fopen("php://output", "w");
+        fputcsv($output, ['Donation ID', 'Type', 'Donor ID', 'Amount', 'Date']);
+
+        foreach ($donations as $donation) {
+            fputcsv($output, $donation);
+        }
+
+        // Add total amount at the end of the CSV
+        fputcsv($output, []);
+        fputcsv($output, ['Total Donations', '', '', $totalAmount]);
+
+        fclose($output);
+        exit;
+    } catch (Exception $e) {
+        error_log("Error generating donation report: " . $e->getMessage());
+        echo "An error occurred while generating the report.";
     }
+}
 
     public function sendEmailToDonor($params) {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -149,5 +150,6 @@ class AdminController {
             echo "Email sent successfully to volunteer.";
         }
     }
+
 }
 

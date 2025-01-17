@@ -96,7 +96,7 @@
 <body>
 
     <div class="container">
-        <h1>Event Report</h1>
+      <center>  <h1>Event Report</h1> </center>
         
         <p><strong>Event Name:</strong> <?= htmlspecialchars($event['name']) ?></p>
         <p><strong>Date:</strong> <?= htmlspecialchars($event['date']) ?></p>
