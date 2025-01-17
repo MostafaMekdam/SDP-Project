@@ -30,5 +30,6 @@
     </table>
 
     <a href="index.php?controller=event&action=view&id=<?= htmlspecialchars($_GET['event_id']) ?>">Back to Event Details</a>
+    <a href="index.php?controller=volunteer&action=assignTasks&event_id=<?= htmlspecialchars($_GET['event_id']) ?>">Assign Tasks to Volunteers</a>
 </body>
 </html>
