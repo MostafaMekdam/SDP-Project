@@ -60,7 +60,6 @@ function displayUserControlPanel()
     switch ($_SESSION['role'] ?? '') {
         case 'Admin':
             echo "<li><a href='?controller=beneficiary&action=listBeneficiaries'>Manage Beneficiaries</a></li>";
-            echo "<li><a href='?controller=communication&action=listCommunications'>Manage Communications</a></li>";
             echo "<li><a href='?controller=donor&action=listDonors'>Manage Donors</a></li>";
             echo "<li><a href='?controller=event&action=list'>Manage Events</a></li>";
             echo "<li><a href='?controller=volunteer&action=listVolunteers'>Manage Volunteers</a></li>";
