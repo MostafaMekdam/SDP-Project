@@ -30,7 +30,8 @@
                     <td><?= htmlspecialchars($donation['date']) ?></td>
                     <td><?= htmlspecialchars($donation['event_id'] ?? 'N/A') ?></td>
                     <td>
-                        <a href="index.php?controller=payment&action=processRefund&donation_id=<?= $donation['donation_id'] ?>">Refund</a>
+                    <a href="index.php?controller=payment&action=processRefund&donation_id=<?= $donation['donation_id'] ?>" 
+                     onclick="return confirm('Are you sure you want to refund this transaction?');"> Refund </a>
                     </td>
                 </tr>
                 <?php endforeach; ?>

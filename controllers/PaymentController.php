@@ -49,34 +49,38 @@ class PaymentController {
         include $viewPath;
     }
     
-
-    /**
-     * Process refund for a specific donation (if applicable).
-     *
-     * @param array $params Array containing the donation ID to refund.
-     */
     public function processRefund($params) {
         checkRole('Admin'); // Ensure only Admin can process refunds
-
+    
         $donationId = $params['donation_id'] ?? null;
-
+    
         if (!$donationId) {
             echo "Error: Donation ID is required.";
             return;
         }
-
+    
         // Check if the donation exists
         $donation = $this->db->query(
             "SELECT * FROM Donation WHERE donation_id = :donation_id",
             [':donation_id' => $donationId]
         );
-
+    
         if (empty($donation)) {
             echo "Error: Donation not found.";
             return;
         }
-
-        // Add logic for marking the donation as refunded if needed
-        echo "Refund functionality is not implemented in this example.";
+    
+        // Delete the donation (refund)
+        $result = $this->db->execute(
+            "DELETE FROM Donation WHERE donation_id = :donation_id",
+            [':donation_id' => $donationId]
+        );
+    
+        if ($result) {
+            echo "<script>alert('Transaction refunded successfully.'); window.location.href='index.php?controller=payment&action=listTransactions';</script>";
+        } else {
+            echo "Error: Failed to refund the transaction.";
+        }
     }
+    
 }
