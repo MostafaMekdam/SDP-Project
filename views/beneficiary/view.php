@@ -11,12 +11,12 @@
             background: linear-gradient(135deg, #a8c0ff, #3f4c6b); /* Soft, neutral gradient */
             display: flex;
             justify-content: center;
-            align-items: center;
-            flex-direction: column; /* For stacking the container and footer */
+            align-items: flex-start; /* Align to start to avoid footer blocking content */
+            flex-direction: column;
             height: 100vh;
             margin: 0;
             text-align: center;
-            
+            position: relative;
         }
 
         /* Main Container */
@@ -27,6 +27,7 @@
             box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 600px;
+            margin-bottom: 60px; /* Added space for footer */
         }
 
         /* Heading */
@@ -69,12 +70,14 @@
 
         /* Footer Styles */
         .footer {
-            position: absolute;
-            bottom: 20px;
+            position: fixed;
+            bottom: 0;
             width: 100%;
             text-align: center;
             color: black;
             font-size: 14px;
+            background-color: #fff; /* Optional, for better visibility */
+            padding: 10px 0;
         }
 
         /* Responsive Design */
@@ -103,8 +106,8 @@
         <a href="index.php?controller=beneficiary&action=listBeneficiaries">Back to Beneficiaries List</a>
     </div>
 
-     <div class="footer">
-      <p>&copy; 2025 Your Organization</p> 
+    <div class="footer">
+        <p>&copy; 2025 Your Organization</p>
     </div>
 
 </body>

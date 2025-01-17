@@ -131,6 +131,10 @@ class PaymentController {
     </table>
 </body>
 <<<<<<< HEAD
+<<<<<<< HEAD
+</html>
+>>>>>>> bf306b41ac6bcb70288a283fe9fbf1c47101b7b7
+=======
 </html>
 >>>>>>> bf306b41ac6bcb70288a283fe9fbf1c47101b7b7
 =======
